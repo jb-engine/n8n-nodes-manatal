@@ -1,5 +1,11 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { CANDIDATE_MODES, CONTACT_MODES, JOB_MODES, MATCH_MODES, ORGANIZATION_MODES } from './SharedFields';
+import {
+	CANDIDATE_MODES,
+	CONTACT_MODES,
+	JOB_MODES,
+	MATCH_MODES,
+	ORGANIZATION_MODES,
+} from './SharedFields';
 
 const ALL_NOTE_RESOURCES = [
 	'candidateNote',
@@ -17,9 +23,19 @@ export const noteOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: { show: { resource: ALL_NOTE_RESOURCES } },
 		options: [
-			{ name: 'Create', value: 'create', action: 'Create a note', description: 'Create a new note' },
+			{
+				name: 'Create',
+				value: 'create',
+				action: 'Create a note',
+				description: 'Create a new note',
+			},
 			{ name: 'Get', value: 'get', action: 'Get a note', description: 'Retrieve a note by ID' },
-			{ name: 'Get Many', value: 'getMany', action: 'Get many notes', description: 'Retrieve all notes' },
+			{
+				name: 'Get Many',
+				value: 'getMany',
+				action: 'Get many notes',
+				description: 'Retrieve all notes',
+			},
 			{ name: 'Update', value: 'update', action: 'Update a note', description: 'Update a note' },
 		],
 		default: 'getMany',
@@ -27,18 +43,15 @@ export const noteOperations: INodeProperties[] = [
 ];
 
 export const noteFields: INodeProperties[] = [
-	// ── Parent ID fields (one per resource) ──────────────────────────────
-
 	{
 		displayName: 'Candidate ID',
 		name: 'candidateId',
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Candidate Get Many step upstream to retrieve IDs',
 		modes: CANDIDATE_MODES,
 		displayOptions: { show: { resource: ['candidateNote'] } },
-		description: 'Numeric ID of the candidate',
+		description: 'Numeric ID of the candidate whose notes to manage',
 	},
 	{
 		displayName: 'Job ID',
@@ -46,10 +59,9 @@ export const noteFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Job Get Many step upstream to retrieve IDs',
 		modes: JOB_MODES,
 		displayOptions: { show: { resource: ['jobNote'] } },
-		description: 'Numeric ID of the job',
+		description: 'Numeric ID of the job whose notes to manage',
 	},
 	{
 		displayName: 'Match ID',
@@ -57,10 +69,9 @@ export const noteFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Match Get Many step upstream to retrieve IDs',
 		modes: MATCH_MODES,
 		displayOptions: { show: { resource: ['matchNote'] } },
-		description: 'Numeric ID of the match',
+		description: 'Numeric ID of the match whose notes to manage',
 	},
 	{
 		displayName: 'Organization ID',
@@ -68,10 +79,9 @@ export const noteFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use an Organization Get Many step upstream to retrieve IDs',
 		modes: ORGANIZATION_MODES,
 		displayOptions: { show: { resource: ['organizationNote'] } },
-		description: 'Numeric ID of the organization',
+		description: 'Numeric ID of the organization whose notes to manage',
 	},
 	{
 		displayName: 'Contact ID',
@@ -79,29 +89,28 @@ export const noteFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Contact Get Many step upstream to retrieve IDs',
 		modes: CONTACT_MODES,
 		displayOptions: { show: { resource: ['contactNote'] } },
-		description: 'Numeric ID of the contact',
+		description: 'Numeric ID of the contact whose notes to manage',
 	},
 
-	// ── Note ID (get / update / delete) ──────────────────────────────────
-
 	{
-		displayName: 'Note ID',
+		displayName: 'Note',
 		name: 'noteId',
-		type: 'string',
+		type: 'options',
 		required: true,
 		default: '',
-		placeholder: 'e.g. 7',
-		hint: 'Use a Note → Get Many step upstream to retrieve IDs',
 		displayOptions: {
 			show: { resource: ALL_NOTE_RESOURCES, operation: ['get', 'update'] },
 		},
-		description: 'Numeric ID of the note',
+		description: 'Note to retrieve or update. Loads from the selected parent resource.',
+		typeOptions: {
+			loadOptionsMethod: 'getNoteOptions',
+			loadOptionsDependsOn: ['candidateId', 'contactId', 'jobId', 'matchId', 'organizationId'],
+		},
 	},
 
-	// ── Create ────────────────────────────────────────────────────────────
+	//	Create
 
 	{
 		displayName: 'Info',
@@ -109,12 +118,13 @@ export const noteFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
+		placeholder: '',
 		typeOptions: { rows: 4 },
 		displayOptions: { show: { resource: ALL_NOTE_RESOURCES, operation: ['create'] } },
-		description: 'Content of the note',
+		description: 'Body text of the note',
 	},
 
-	// ── Update ────────────────────────────────────────────────────────────
+	// Update
 
 	{
 		displayName: 'Update Fields',
@@ -129,8 +139,9 @@ export const noteFields: INodeProperties[] = [
 				name: 'info',
 				type: 'string',
 				default: '',
+				placeholder: '',
 				typeOptions: { rows: 4 },
-				description: 'New content of the note',
+				description: 'Replacement body text for the note',
 			},
 		],
 	},

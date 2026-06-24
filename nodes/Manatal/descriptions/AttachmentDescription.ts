@@ -1,5 +1,12 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { CANDIDATE_MODES, CONTACT_MODES, JOB_MODES, MATCH_MODES, ORGANIZATION_MODES } from './SharedFields';
+import {
+	CANDIDATE_MODES,
+	CONTACT_MODES,
+	JOB_MODES,
+	MATCH_MODES,
+	ORGANIZATION_MODES,
+	USER_MODES,
+} from './SharedFields';
 
 const ALL_ATTACHMENT_RESOURCES = [
 	'candidateAttachment',
@@ -17,17 +24,37 @@ export const attachmentOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES } },
 		options: [
-			{ name: 'Create', value: 'create', action: 'Create an attachment', description: 'Upload a new attachment' },
-			{ name: 'Get', value: 'get', action: 'Get an attachment', description: 'Retrieve an attachment by ID' },
-			{ name: 'Get Many', value: 'getMany', action: 'Get many attachments', description: 'Retrieve all attachments' },
-			{ name: 'Update', value: 'update', action: 'Update an attachment', description: 'Update an attachment' },
+			{
+				name: 'Create',
+				value: 'create',
+				action: 'Create an attachment',
+				description: 'Upload a new attachment',
+			},
+			{
+				name: 'Get',
+				value: 'get',
+				action: 'Get an attachment',
+				description: 'Retrieve an attachment by ID',
+			},
+			{
+				name: 'Get Many',
+				value: 'getMany',
+				action: 'Get many attachments',
+				description: 'Retrieve all attachments',
+			},
+			{
+				name: 'Update',
+				value: 'update',
+				action: 'Update an attachment',
+				description: 'Update an attachment',
+			},
 		],
 		default: 'getMany',
 	},
 ];
 
 export const attachmentFields: INodeProperties[] = [
-	// ── Parent ID fields ──────────────────────────────────────────────────
+	//  Parent ID fields
 
 	{
 		displayName: 'Candidate ID',
@@ -35,10 +62,9 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Candidate Get Many step upstream to retrieve IDs',
 		modes: CANDIDATE_MODES,
 		displayOptions: { show: { resource: ['candidateAttachment'] } },
-		description: 'Numeric ID of the candidate',
+		description: 'Numeric ID of the candidate whose attachments to manage',
 	},
 	{
 		displayName: 'Job ID',
@@ -46,10 +72,9 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Job Get Many step upstream to retrieve IDs',
 		modes: JOB_MODES,
 		displayOptions: { show: { resource: ['jobAttachment'] } },
-		description: 'Numeric ID of the job',
+		description: 'Numeric ID of the job whose attachments to manage',
 	},
 	{
 		displayName: 'Match ID',
@@ -57,10 +82,9 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Match Get Many step upstream to retrieve IDs',
 		modes: MATCH_MODES,
 		displayOptions: { show: { resource: ['matchAttachment'] } },
-		description: 'Numeric ID of the match',
+		description: 'Numeric ID of the match whose attachments to manage',
 	},
 	{
 		displayName: 'Organization ID',
@@ -68,10 +92,9 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use an Organization Get Many step upstream to retrieve IDs',
 		modes: ORGANIZATION_MODES,
 		displayOptions: { show: { resource: ['organizationAttachment'] } },
-		description: 'Numeric ID of the organization',
+		description: 'Numeric ID of the organization whose attachments to manage',
 	},
 	{
 		displayName: 'Contact ID',
@@ -79,29 +102,30 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Contact Get Many step upstream to retrieve IDs',
 		modes: CONTACT_MODES,
 		displayOptions: { show: { resource: ['contactAttachment'] } },
-		description: 'Numeric ID of the contact',
+		description: 'Numeric ID of the contact whose attachments to manage',
 	},
 
-	// ── Attachment ID (get / update / delete) ─────────────────────────────
+	//  Attachment ID (get / update / delete)
 
 	{
-		displayName: 'Attachment ID',
+		displayName: 'Attachment',
 		name: 'attachmentId',
-		type: 'string',
+		type: 'options',
 		required: true,
 		default: '',
-		placeholder: 'e.g. 7',
-		hint: 'Use an Attachment → Get Many step upstream to retrieve IDs',
 		displayOptions: {
 			show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['get', 'update'] },
 		},
-		description: 'Numeric ID of the attachment',
+		description: 'Attachment to retrieve or update. Loads from the selected parent resource.',
+		typeOptions: {
+			loadOptionsMethod: 'getAttachmentOptions',
+			loadOptionsDependsOn: ['candidateId', 'contactId', 'jobId', 'matchId', 'organizationId'],
+		},
 	},
 
-	// ── Create ────────────────────────────────────────────────────────────
+	//	Create
 
 	{
 		displayName: 'Name',
@@ -109,8 +133,9 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
+		placeholder: 'offer_letter.pdf',
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['create'] } },
-		description: 'Name of the attachment',
+		description: 'Display name for this attachment',
 	},
 	{
 		displayName: 'File URL',
@@ -118,9 +143,9 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'https://example.com/file.pdf',
+		placeholder: 'https://example.com/offer_letter.pdf',
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['create'] } },
-		description: 'URL pointing to the file',
+		description: 'Publicly accessible URL pointing to the file to attach',
 	},
 	{
 		displayName: 'Additional Fields',
@@ -131,16 +156,24 @@ export const attachmentFields: INodeProperties[] = [
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['create'] } },
 		options: [
 			{
+				displayName: 'Creator',
+				name: 'creator',
+				type: 'resourceLocator',
+				default: { mode: 'list', value: '' },
+				description: 'User to attribute as the creator of this attachment',
+				modes: USER_MODES,
+			},
+			{
 				displayName: 'Description',
 				name: 'description',
 				type: 'string',
 				default: '',
-				description: 'Description of the attachment',
+				description: 'Free-text notes about what this attachment contains',
 			},
 		],
 	},
 
-	// ── Update ────────────────────────────────────────────────────────────
+	//	Update
 
 	{
 		displayName: 'Update Fields',
@@ -151,25 +184,35 @@ export const attachmentFields: INodeProperties[] = [
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['update'] } },
 		options: [
 			{
+				displayName: 'Creator',
+				name: 'creator',
+				type: 'resourceLocator',
+				default: { mode: 'list', value: '' },
+				description: 'User to attribute as the creator of this attachment',
+				modes: USER_MODES,
+			},
+			{
 				displayName: 'Description',
 				name: 'description',
 				type: 'string',
 				default: '',
-				description: 'Description of the attachment',
+				description: 'Free-text notes about what this attachment contains',
 			},
 			{
 				displayName: 'File URL',
 				name: 'file',
 				type: 'string',
 				default: '',
-				description: 'URL pointing to the file',
+				placeholder: 'https://example.com/offer_letter.pdf',
+				description: 'Publicly accessible URL pointing to the replacement file',
 			},
 			{
 				displayName: 'Name',
 				name: 'name',
 				type: 'string',
 				default: '',
-				description: 'Name of the attachment',
+				placeholder: 'offer_letter.pdf',
+				description: 'Display name for this attachment',
 			},
 		],
 	},

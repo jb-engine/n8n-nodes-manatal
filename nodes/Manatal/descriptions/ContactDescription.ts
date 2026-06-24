@@ -47,15 +47,14 @@ export const contactFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Contact Get Many step upstream to retrieve IDs',
 		modes: CONTACT_MODES,
 		displayOptions: {
 			show: { resource: ['contact'], operation: ['get'] },
 		},
-		description: 'Numeric ID of the contact',
+		description: 'Numeric ID of the contact to retrieve',
 	},
 
-	// ── GET MANY ─────────────────────────────────────────────────────────
+	//  GET MANY
 	{
 		displayName: 'Return All',
 		name: 'returnAll',
@@ -64,7 +63,7 @@ export const contactFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['contact'], operation: ['getMany'] },
 		},
-		description: 'Whether to return all results or only up to a given limit',
+		description: 'Fetch every matching contact instead of stopping at the limit',
 	},
 	{
 		displayName: 'Limit',
@@ -106,35 +105,38 @@ export const contactFields: INodeProperties[] = [
 				name: 'display_name',
 				type: 'string',
 				default: '',
-				description: 'Filter by display name (partial match)',
+				placeholder: 'Jane Smith',
+				description: 'Return contacts whose display name contains this text (partial match)',
 			},
 			{
 				displayName: 'Email',
 				name: 'email',
 				type: 'string',
 				default: '',
-				placeholder: 'name@email.com',
+				placeholder: 'jane.smith@company.com',
+				description: 'Return contacts with this exact email address',
 			},
 			{
 				displayName: 'Full Name',
 				name: 'full_name',
 				type: 'string',
 				default: '',
-				description: 'Filter by name (partial match)',
+				placeholder: 'Jane Smith',
+				description: 'Return contacts whose name contains this text (partial match)',
 			},
 			{
 				displayName: 'ID',
 				name: 'id',
 				type: 'number',
 				default: '',
-				description: 'Filter by exact contact ID',
+				description: 'Return the contact with this exact ID',
 			},
 			{
 				displayName: 'Organization',
 				name: 'organization',
 				type: 'resourceLocator',
 				default: { mode: 'list', value: '' },
-				description: 'Filter by organization',
+				description: 'Return contacts belonging to this organization',
 				modes: ORGANIZATION_MODES,
 			},
 			{
@@ -142,6 +144,8 @@ export const contactFields: INodeProperties[] = [
 				name: 'phone_number',
 				type: 'string',
 				default: '',
+				placeholder: '+1 555 000 0001',
+				description: 'Return contacts with this exact phone number',
 			},
 			{
 				displayName: 'Updated At (From)',
@@ -160,17 +164,18 @@ export const contactFields: INodeProperties[] = [
 		],
 	},
 
-	// ── CREATE ───────────────────────────────────────────────────────────
+	//	CREATE
 	{
 		displayName: 'Full Name',
 		name: 'fullName',
 		type: 'string',
 		required: true,
 		default: '',
+		placeholder: 'Jane Smith',
 		displayOptions: {
 			show: { resource: ['contact'], operation: ['create'] },
 		},
-		description: "The contact's full name",
+		description: 'Full name of the contact',
 	},
 	{
 		displayName: 'Organization',
@@ -182,7 +187,7 @@ export const contactFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['contact'], operation: ['create'] },
 		},
-		description: 'The organization this contact belongs to',
+		description: 'Organization this contact is associated with',
 	},
 	{
 		displayName: 'Additional Fields',
@@ -200,7 +205,7 @@ export const contactFields: INodeProperties[] = [
 				type: 'json',
 				default: '{}',
 				description:
-					'Custom field values as a JSON object. Must be a full object — partial updates will overwrite existing values.',
+					'Custom field values as a JSON object. Must be a full object â€" partial updates will overwrite existing values.',
 			},
 			{
 				displayName: 'Description',
@@ -208,41 +213,42 @@ export const contactFields: INodeProperties[] = [
 				type: 'string',
 				typeOptions: { rows: 4 },
 				default: '',
-				description: 'Description of the contact',
+				description: 'Free-text notes or summary about the contact',
 			},
 			{
 				displayName: 'Display Name',
 				name: 'display_name',
 				type: 'string',
 				default: '',
-				description: 'An alternative display name for the contact',
+				placeholder: 'Jane Smith',
+				description: 'Alternative display name shown in lists instead of the full name',
 			},
 			{
 				displayName: 'Email',
 				name: 'email',
 				type: 'string',
-				placeholder: 'name@email.com',
+				placeholder: 'jane.smith@company.com',
 				default: '',
-				description: 'Contact email address',
+				description: "Contact's primary email address",
 			},
 			{
 				displayName: 'Phone Number',
 				name: 'phone_number',
 				type: 'string',
 				default: '',
-				description: 'Contact phone number',
+				placeholder: '+1 555 000 0001',
+				description: "Contact's primary phone number",
 			},
 		],
 	},
 
-	// ── UPDATE ───────────────────────────────────────────────────────────
+	// UPDATE
 	{
 		displayName: 'Contact ID',
 		name: 'contactId',
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Contact Get Many step upstream to retrieve IDs',
 		modes: CONTACT_MODES,
 		displayOptions: {
 			show: { resource: ['contact'], operation: ['update'] },
@@ -265,7 +271,7 @@ export const contactFields: INodeProperties[] = [
 				type: 'json',
 				default: '{}',
 				description:
-					'Custom field values as a JSON object. Must be a full object — partial updates will overwrite existing values.',
+					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
 			},
 			{
 				displayName: 'Description',
@@ -273,25 +279,31 @@ export const contactFields: INodeProperties[] = [
 				type: 'string',
 				typeOptions: { rows: 4 },
 				default: '',
+				description: 'Free-text notes or summary about the contact',
 			},
 			{
 				displayName: 'Display Name',
 				name: 'display_name',
 				type: 'string',
 				default: '',
+				placeholder: 'Jane Smith',
+				description: 'Alternative display name shown in lists instead of the full name',
 			},
 			{
 				displayName: 'Email',
 				name: 'email',
 				type: 'string',
-				placeholder: 'name@email.com',
+				placeholder: 'jane.smith@company.com',
 				default: '',
+				description: "Contact's primary email address",
 			},
 			{
 				displayName: 'Full Name',
 				name: 'full_name',
 				type: 'string',
 				default: '',
+				placeholder: 'Jane Smith',
+				description: "Contact's full name",
 			},
 			{
 				displayName: 'Organization',
@@ -299,12 +311,15 @@ export const contactFields: INodeProperties[] = [
 				type: 'resourceLocator',
 				default: { mode: 'list', value: '' },
 				modes: ORGANIZATION_MODES,
+				description: 'Organization this contact is associated with',
 			},
 			{
 				displayName: 'Phone Number',
 				name: 'phone_number',
 				type: 'string',
 				default: '',
+				placeholder: '+1 555 000 0001',
+				description: "Contact's primary phone number",
 			},
 		],
 	},

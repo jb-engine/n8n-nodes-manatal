@@ -1,5 +1,10 @@
-import type { INodeProperties } from 'n8n-workflow';
-import { CANDIDATE_MODES, JOB_MODES, MATCH_MODES, MATCH_STAGE_MODES, USER_MODES } from './SharedFields';
+﻿import type { INodeProperties } from 'n8n-workflow';
+import {
+	CANDIDATE_MODES,
+	JOB_MODES,
+	MATCH_MODES,
+	USER_MODES,
+} from './SharedFields';
 
 export const matchOperations: INodeProperties[] = [
 	{
@@ -15,7 +20,7 @@ export const matchOperations: INodeProperties[] = [
 				name: 'Create',
 				value: 'create',
 				action: 'Create a match',
-				description: 'Add a candidate to a job pipeline',
+				description: 'Creates a new match',
 			},
 			{
 				name: 'Get',
@@ -47,15 +52,14 @@ export const matchFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Match Get Many step upstream to retrieve IDs',
 		modes: MATCH_MODES,
 		displayOptions: {
 			show: { resource: ['match'], operation: ['get'] },
 		},
-		description: 'Numeric ID of the match',
+		description: 'Numeric ID of the match to retrieve',
 	},
 
-	// ── GET MANY ─────────────────────────────────────────────────────────
+	//	GET MANY
 	{
 		displayName: 'Return All',
 		name: 'returnAll',
@@ -64,7 +68,7 @@ export const matchFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['match'], operation: ['getMany'] },
 		},
-		description: 'Whether to return all results or only up to a given limit',
+		description: 'Fetch every match instead of stopping at the limit',
 	},
 	{
 		displayName: 'Limit',
@@ -106,103 +110,116 @@ export const matchFields: INodeProperties[] = [
 				name: 'dropped_at__gte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where the candidate was dropped on or after this date',
 			},
 			{
 				displayName: 'Dropped At (To)',
 				name: 'dropped_at__lte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where the candidate was dropped on or before this date',
 			},
 			{
 				displayName: 'External ID',
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				description: 'Filter by the external system ID',
+				placeholder: 'EXT-00142',
+				description: 'Return matches with this exact external system ID',
 			},
 			{
 				displayName: 'Hired At (From)',
 				name: 'hired_at__gte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where the candidate was hired on or after this date',
 			},
 			{
 				displayName: 'Hired At (To)',
 				name: 'hired_at__lte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where the candidate was hired on or before this date',
 			},
 			{
 				displayName: 'Interview At (From)',
 				name: 'interview_at__gte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where the interview was scheduled on or after this date',
 			},
 			{
 				displayName: 'Interview At (To)',
 				name: 'interview_at__lte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where the interview was scheduled on or before this date',
 			},
 			{
 				displayName: 'Offer At (From)',
 				name: 'offer_at__gte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where an offer was made on or after this date',
 			},
 			{
 				displayName: 'Offer At (To)',
 				name: 'offer_at__lte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches where an offer was made on or before this date',
 			},
 			{
 				displayName: 'Stage IDs',
 				name: 'stage__in',
 				type: 'string',
 				default: '',
-				description: 'Filter by stage IDs (comma-separated, e.g. "1,2,3")',
+				placeholder: '12124,34123,56123',
+				description: 'Return matches in any of these pipeline stage IDs (comma-separated)',
 			},
 			{
 				displayName: 'Submitted At (From)',
 				name: 'submitted_at__gte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches submitted on or after this date',
 			},
 			{
 				displayName: 'Submitted At (To)',
 				name: 'submitted_at__lte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches submitted on or before this date',
 			},
 			{
 				displayName: 'Updated At (From)',
 				name: 'updated_at__gte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches updated on or after this date',
 			},
 			{
 				displayName: 'Updated At (To)',
 				name: 'updated_at__lte',
 				type: 'dateTime',
 				default: '',
+				description: 'Return matches updated on or before this date',
 			},
 		],
 	},
 
-	// ── CREATE ───────────────────────────────────────────────────────────
+	// CREATE
 	{
 		displayName: 'Candidate ID',
 		name: 'candidateId',
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Candidate Get Many step upstream to retrieve IDs',
 		modes: CANDIDATE_MODES,
 		displayOptions: {
 			show: { resource: ['match'], operation: ['create'] },
 		},
-		description: 'Numeric ID of the candidate to add to the job',
+		description: 'Numeric ID of the candidate',
 	},
 	{
 		displayName: 'Job ID',
@@ -210,12 +227,11 @@ export const matchFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Job Get Many step upstream to retrieve IDs',
 		modes: JOB_MODES,
 		displayOptions: {
 			show: { resource: ['match'], operation: ['create'] },
 		},
-		description: 'The ID of the job to add the candidate to',
+		description: 'Numeric ID of the job',
 	},
 	{
 		displayName: 'Additional Fields',
@@ -233,7 +249,7 @@ export const matchFields: INodeProperties[] = [
 				type: 'json',
 				default: '{}',
 				description:
-					'Custom field values as a JSON object. Must be a full object — partial updates will overwrite existing values.',
+					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
 			},
 			{
 				displayName: 'Dropped At',
@@ -247,42 +263,43 @@ export const matchFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				description: 'ID of the match in the API consumer system',
+				placeholder: 'EXT-00142',
+				description: 'Identifier for this match in an external system',
 			},
 			{
 				displayName: 'Hired At',
 				name: 'hired_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date the candidate was hired',
+				description: 'Date the candidate was hired for this position',
 			},
 			{
 				displayName: 'Interview At',
 				name: 'interview_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date the candidate was last interviewed',
+				description: 'Date the candidate was last interviewed for this position',
 			},
 			{
 				displayName: 'Is Active',
 				name: 'is_active',
 				type: 'boolean',
 				default: true,
-				description: 'Whether this match is active in the pipeline',
+				description: 'Keep this match active in the pipeline; disable to mark it as inactive',
 			},
 			{
 				displayName: 'Offer At',
 				name: 'offer_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date an offer was made to the candidate',
+				description: 'Date an offer was extended to the candidate',
 			},
 			{
 				displayName: 'Owner',
 				name: 'owner',
 				type: 'resourceLocator',
 				default: { mode: 'list', value: '' },
-				description: 'User who owns this match record',
+				description: 'User responsible for managing this pipeline entry',
 				modes: USER_MODES,
 			},
 			{
@@ -290,19 +307,18 @@ export const matchFields: INodeProperties[] = [
 				name: 'submitted_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date the candidate was added to the job',
+				description: 'Date the candidate was submitted to the job pipeline',
 			},
 		],
 	},
 
-	// ── UPDATE ───────────────────────────────────────────────────────────
+	//	UPDATE
 	{
 		displayName: 'Match ID',
 		name: 'matchId',
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		hint: 'Use a Match Get Many step upstream to retrieve IDs',
 		modes: MATCH_MODES,
 		displayOptions: {
 			show: { resource: ['match'], operation: ['update'] },
@@ -325,7 +341,7 @@ export const matchFields: INodeProperties[] = [
 				type: 'json',
 				default: '{}',
 				description:
-					'Custom field values as a JSON object. Must be a full object — partial updates will overwrite existing values.',
+					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
 			},
 			{
 				displayName: 'Dropped At',
@@ -339,34 +355,36 @@ export const matchFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
+				placeholder: 'EXT-00142',
+				description: 'Identifier for this match in an external system',
 			},
 			{
 				displayName: 'Hired At',
 				name: 'hired_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date the candidate was hired',
+				description: 'Date the candidate was hired for this position',
 			},
 			{
 				displayName: 'Interview At',
 				name: 'interview_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date the candidate was last interviewed',
+				description: 'Date the candidate was last interviewed for this position',
 			},
 			{
 				displayName: 'Is Active',
 				name: 'is_active',
 				type: 'boolean',
 				default: true,
-				description: 'Whether this match is active in the pipeline',
+				description: 'Keep this match active in the pipeline; disable to mark it as inactive',
 			},
 			{
 				displayName: 'Offer At',
 				name: 'offer_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date an offer was made to the candidate',
+				description: 'Date an offer was extended to the candidate',
 			},
 			{
 				displayName: 'Owner',
@@ -374,21 +392,25 @@ export const matchFields: INodeProperties[] = [
 				type: 'resourceLocator',
 				default: { mode: 'list', value: '' },
 				modes: USER_MODES,
+				description: 'User responsible for managing this pipeline entry',
 			},
 			{
 				displayName: 'Stage',
 				name: 'job_pipeline_stage',
-				type: 'resourceLocator',
-				default: { mode: 'list', value: '' },
-				modes: MATCH_STAGE_MODES,
-				description: 'The pipeline stage for this match',
+				type: 'options',
+				default: '',
+				description: 'Pipeline stage to move this match to. Loads stages from the pipeline assigned to the selected match.',
+				typeOptions: {
+					loadOptionsMethod: 'getMatchPipelineStages',
+					loadOptionsDependsOn: ['matchId'],
+				},
 			},
 			{
 				displayName: 'Submitted At',
 				name: 'submitted_at',
 				type: 'dateTime',
 				default: '',
-				description: 'Date the candidate was added to the job',
+				description: 'Date the candidate was submitted to the job pipeline',
 			},
 		],
 	},

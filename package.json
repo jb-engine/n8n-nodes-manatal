@@ -1,56 +1,56 @@
 {
-  "name": "@manatal/n8n-nodes-manatal",
-  "version": "0.1.0",
-  "description": "n8n community node for Manatal ATS",
-  "license": "MIT",
-  "author": {
-    "name": "Manatal",
-    "email": "support@manatal.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/aaron-stern2112/n8n-app-test.git"
-  },
-  "keywords": [
-    "n8n-community-node-package"
-  ],
-  "main": "index.js",
-  "files": [
-    "dist"
-  ],
-  "n8n": {
-    "n8nNodesApiVersion": 1,
-    "credentials": [
-      "dist/credentials/ManatalOpenAPIKey.credentials.js"
-    ],
-    "nodes": [
-      "dist/nodes/Manatal/Manatal.node.js",
-      "dist/nodes/Manatal/ManatalTrigger.node.js"
-    ]
-  },
-  "scripts": {
-    "build": "tsc --project tsconfig.json && node scripts/copy-assets.mjs",
-    "dev": "tsc --project tsconfig.json --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lint:fix": "eslint nodes credentials package.json --fix",
-    "node:lint": "n8n-node lint",
-    "node:build": "n8n-node build",
-    "node:dev": "n8n-node dev",
-    "prepublishOnly": "npm run build && npm run lint && npm run node:lint"
-  },
-  "peerDependencies": {
-    "n8n-workflow": "*"
-  },
-  "devDependencies": {
-    "@n8n/eslint-plugin-community-nodes": "*",
-    "@n8n/node-cli": ">=0.23.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^9.0.0",
-    "n8n-core": "2.16.1",
-    "n8n-workflow": "2.16.0",
-    "prettier": "^3.0.0",
-    "typescript": "~5.1.0"
-  }
+	"name": "@manatal/n8n-nodes-manatal",
+	"version": "1.0.0",
+	"description": "n8n community node for Manatal — automate your ATS workflows by connecting candidates, jobs, matches, contacts, and organisations to 400+ services",
+	"license": "MIT",
+	"author": {
+		"name": "Manatal",
+		"email": "support@manatal.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jb-engine/n8n-nodes-manatal.git"
+	},
+	"keywords": [
+		"n8n-community-node-package"
+	],
+	"main": "index.js",
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"credentials": [
+			"dist/credentials/ManatalOpenAPIKey.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Manatal/Manatal.node.js",
+			"dist/nodes/Manatal/ManatalTrigger.node.js"
+		]
+	},
+	"scripts": {
+		"build": "tsc --project tsconfig.json && node scripts/copy-assets.mjs",
+		"dev": "tsc --project tsconfig.json --watch",
+		"format": "prettier nodes credentials --write",
+		"lint": "eslint nodes credentials package.json",
+		"lint:fix": "eslint nodes credentials package.json --fix",
+		"node:lint": "n8n-node lint",
+		"node:build": "n8n-node build",
+		"node:dev": "n8n-node dev",
+		"prepublishOnly": "npm run build && npm run lint && npm run node:lint"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	},
+	"devDependencies": {
+		"@n8n/eslint-plugin-community-nodes": "*",
+		"@n8n/node-cli": ">=0.23.0",
+		"@typescript-eslint/eslint-plugin": "^8.0.0",
+		"@typescript-eslint/parser": "^8.0.0",
+		"eslint": "^9.0.0",
+		"n8n-core": "2.16.1",
+		"n8n-workflow": "2.16.0",
+		"prettier": "^3.0.0",
+		"typescript": "~5.1.0"
+	}
 }

@@ -1,3 +1,23 @@
+/**
+ * Manatal.node.ts
+ *
+ * Main action node for the Manatal ATS integration.
+ * Exposes CRUD operations for 19 resources across candidates, contacts, jobs,
+ * matches, organizations, notes, attachments, and candidate/job sub-resources.
+ *
+ * Architecture:
+ * - The resource dropdown and all field definitions live in *Description.ts files.
+ * - Execution logic is split into handler files (handlers/*.ts) — one per resource group.
+ * - This file wires everything together: imports descriptions, imports handlers,
+ *   and routes each resource/operation combination to the correct handler in execute().
+ *
+ * loadOptions methods power dynamic dropdowns (users, stages, industries, etc.)
+ * by fetching lookup data from the Manatal API at design time.
+ *
+ * listSearch methods support the "By Name" search mode on resourceLocator fields,
+ * enabling users to search for records rather than pasting raw IDs.
+ */
+
 import type {
 	IDataObject,
 	IExecuteFunctions,
@@ -15,17 +35,18 @@ import { candidateFields, candidateOperations } from './descriptions/CandidateDe
 import {
 	candidateMatchViewFields,
 	candidateMatchViewOperations,
-	candidateNationalityFields,
-	candidateNationalityOperations,
 	candidateResumeFields,
 	candidateResumeOperations,
 	candidateSocialMediaFields,
 	candidateSocialMediaOperations,
 } from './descriptions/CandidateSubresourceDescription';
 import { contactFields, contactOperations } from './descriptions/ContactDescription';
-import { manatalApiRequest } from './GenericFunctions';
+import { manatalApiRequest, normalizeManatalId, parentResourcePath } from './GenericFunctions';
 import { jobFields, jobOperations } from './descriptions/JobDescription';
-import { jobMatchViewFields, jobMatchViewOperations } from './descriptions/JobSubresourceDescription';
+import {
+	jobMatchViewFields,
+	jobMatchViewOperations,
+} from './descriptions/JobSubresourceDescription';
 import { matchFields, matchOperations } from './descriptions/MatchDescription';
 import { noteFields, noteOperations } from './descriptions/NoteDescription';
 import { organizationFields, organizationOperations } from './descriptions/OrganizationDescription';
@@ -40,12 +61,38 @@ import { matchExecute } from './handlers/match';
 import { noteExecute } from './handlers/note';
 import { organizationExecute } from './handlers/organization';
 
-const CANDIDATE_SUBRESOURCES = [
-	'candidateNationality',
-	'candidateResume',
-	'candidateSocialMedia',
-	'candidateMatch',
-];
+async function loadSubresourceOptions(
+	ctx: ILoadOptionsFunctions,
+	subpath: string,
+	mapFn: (item: IDataObject) => INodePropertyOptions,
+): Promise<INodePropertyOptions[]> {
+	const resource = ctx.getNodeParameter('resource') as string;
+	let parentInfo: { apiBase: string; idParam: string };
+	try {
+		parentInfo = parentResourcePath(resource);
+	} catch {
+		return [];
+	}
+	const { apiBase, idParam } = parentInfo;
+	const parentId = normalizeManatalId(ctx.getNodeParameter(idParam) as IDataObject | string);
+	if (!parentId) return [];
+	const items = (await manatalApiRequest.call(
+		ctx,
+		'GET',
+		`/${apiBase}/${parentId}/${subpath}`,
+	)) as unknown as IDataObject[];
+	return (Array.isArray(items) ? items : []).map(mapFn);
+}
+
+// Industries endpoint returns either a raw array or a { count, results[] } envelope
+async function fetchIndustries(ctx: ILoadOptionsFunctions): Promise<IDataObject[]> {
+	const response = await manatalApiRequest.call(ctx, 'GET', '/industries/');
+	return (
+		Array.isArray(response) ? response : ((response.results as IDataObject[]) ?? [])
+	) as IDataObject[];
+}
+
+const CANDIDATE_SUBRESOURCES = ['candidateResume', 'candidateSocialMedia', 'candidateMatch'];
 
 export class Manatal implements INodeType {
 	description: INodeTypeDescription = {
@@ -76,7 +123,6 @@ export class Manatal implements INodeType {
 					{ name: 'Candidate', value: 'candidate' },
 					{ name: 'Candidate Attachment', value: 'candidateAttachment' },
 					{ name: 'Candidate Match', value: 'candidateMatch' },
-					{ name: 'Candidate Nationality', value: 'candidateNationality' },
 					{ name: 'Candidate Note', value: 'candidateNote' },
 					{ name: 'Candidate Resume', value: 'candidateResume' },
 					{ name: 'Candidate Social Media', value: 'candidateSocialMedia' },
@@ -113,8 +159,6 @@ export class Manatal implements INodeType {
 			...attachmentOperations,
 			...attachmentFields,
 			// Candidate-specific sub-resources
-			...candidateNationalityOperations,
-			...candidateNationalityFields,
 			...candidateResumeOperations,
 			...candidateResumeFields,
 			...candidateSocialMediaOperations,
@@ -144,26 +188,8 @@ export class Manatal implements INodeType {
 				}));
 			},
 
-			async getMatchStages(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const response = await manatalApiRequest.call(
-					this,
-					'GET',
-					'/match-stages/',
-					{},
-					{ page_size: 100 },
-				);
-				const stages = (response.results as IDataObject[]) ?? [];
-				return stages.map((s) => ({
-					name: s.name as string,
-					value: s.id as string | number,
-				}));
-			},
-
 			async getIndustries(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const response = await manatalApiRequest.call(this, 'GET', '/industries/');
-				const industries = (
-					Array.isArray(response) ? response : ((response.results as IDataObject[]) ?? [])
-				) as IDataObject[];
+				const industries = await fetchIndustries(this);
 				return industries.map((ind) => ({
 					name: ind.name as string,
 					value: ind.id as string | number,
@@ -193,6 +219,44 @@ export class Manatal implements INodeType {
 					value: n.id as string | number,
 				}));
 			},
+
+			async getAttachmentOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return loadSubresourceOptions(this, 'attachments/', (att) => ({
+					name: `#${String(att.id)}${att.name ? ` — ${String(att.name)}` : ''}`,
+					value: att.id as number,
+				}));
+			},
+
+			async getNoteOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				return loadSubresourceOptions(this, 'notes/', (note) => ({
+					name: `#${String(note.id)}${note.info ? ` - ${String(note.info).slice(0, 25)}` : ''}`,
+					value: note.id as number,
+				}));
+			},
+
+			async getMatchPipelineStages(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const matchLocator = this.getNodeParameter('matchId') as IDataObject | string;
+				const matchId = normalizeManatalId(matchLocator);
+				if (!matchId) return [];
+				const match = (await manatalApiRequest.call(
+					this,
+					'GET',
+					`/matches/${matchId}/`,
+				)) as IDataObject;
+				const pipelineId = ((match.job_pipeline_stage as IDataObject)?.job_pipeline as IDataObject)
+					?.id;
+				if (!pipelineId) return [];
+				const pipeline = (await manatalApiRequest.call(
+					this,
+					'GET',
+					`/job-pipelines/${pipelineId}/`,
+				)) as IDataObject;
+				const stages = (pipeline.job_pipeline_stages as IDataObject[]) ?? [];
+				return stages.map((stage) => ({
+					name: stage.name as string,
+					value: stage.id as number,
+				}));
+			},
 		},
 
 		listSearch: {
@@ -200,10 +264,7 @@ export class Manatal implements INodeType {
 				this: ILoadOptionsFunctions,
 				filter?: string,
 			): Promise<INodeListSearchResult> {
-				const response = await manatalApiRequest.call(this, 'GET', '/industries/');
-				const all = (
-					Array.isArray(response) ? response : ((response.results as IDataObject[]) ?? [])
-				) as IDataObject[];
+				const all = await fetchIndustries(this);
 				const filtered = filter
 					? all.filter((ind) => (ind.name as string).toLowerCase().includes(filter.toLowerCase()))
 					: all;
@@ -331,35 +392,22 @@ export class Manatal implements INodeType {
 				if (paginationToken) qs.page = Number(paginationToken);
 				const response = await manatalApiRequest.call(this, 'GET', '/matches/', {}, qs);
 				const matches = (response.results as IDataObject[]) ?? [];
+				const currentPage = paginationToken ? Number(paginationToken) : 1;
 				const filtered = filter
-					? matches.filter((match) => JSON.stringify(match).toLowerCase().includes(filter.toLowerCase()))
+					? matches.filter((match) =>
+							JSON.stringify(match).toLowerCase().includes(filter.toLowerCase()),
+						)
 					: matches;
-				const currentPage = paginationToken ? Number(paginationToken) : 1;
 				return {
-					results: filtered.map((match) => ({
-						name: `Match ${String(match.id)}: Candidate ${String(match.candidate)} - Job ${String(match.job)}`,
-						value: match.id as string | number,
-					})),
-					paginationToken: filtered.length > 0 && response.next ? String(currentPage + 1) : undefined,
-				};
-			},
-
-			async searchMatchStages(
-				this: ILoadOptionsFunctions,
-				filter?: string,
-				paginationToken?: string,
-			): Promise<INodeListSearchResult> {
-				const qs: IDataObject = { page_size: 50 };
-				if (filter) qs.search = filter;
-				if (paginationToken) qs.page = Number(paginationToken);
-				const response = await manatalApiRequest.call(this, 'GET', '/match-stages/', {}, qs);
-				const stages = (response.results as IDataObject[]) ?? [];
-				const currentPage = paginationToken ? Number(paginationToken) : 1;
-				return {
-					results: stages.map((stage) => ({
-						name: stage.name as string,
-						value: stage.id as string | number,
-					})),
+					results: filtered.map((match) => {
+						const s = match.job_pipeline_stage as IDataObject | null;
+						const stageSuffix =
+							s && typeof s === 'object' && s.name ? ` [${s.name as string}]` : '';
+						return {
+							name: `Match ${String(match.id)}: Candidate ${String(match.candidate)} - Job ${String(match.job)}${stageSuffix}`,
+							value: match.id as string | number,
+						};
+					}),
 					paginationToken: response.next ? String(currentPage + 1) : undefined,
 				};
 			},

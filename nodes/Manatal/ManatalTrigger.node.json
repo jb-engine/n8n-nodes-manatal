@@ -7,5 +7,19 @@
 		"primaryDocumentation": [{ "url": "https://developers.manatal.com/reference/getting-started" }],
 		"credentialDocumentation": [{ "url": "https://support.manatal.com/docs/manatal-api" }]
 	},
-	"alias": ["ATS", "recruiting", "HR", "trigger", "webhook", "hiring", "talent acquisition"]
+	"alias": [
+		"ATS",
+		"Productivity",
+		"recruiting",
+		"HR",
+		"applicant tracking",
+		"applicant tracking system",
+		"candidate",
+		"job",
+		"match",
+		"recruitment automation",
+		"hiring",
+		"talent acquisition",
+		"recruitment"
+	]
 }

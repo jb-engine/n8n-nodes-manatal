@@ -1,3 +1,18 @@
+/**
+ * handlers/jobSubresources.ts
+ *
+ * Handles job-specific sub-resources.
+ *
+ * Currently supports:
+ *   jobMatch — read-only view of pipeline matches for a job
+ *              (/jobs/{jobId}/matches/)
+ *              Uses the standard paginated handleGetMany for getMany,
+ *              and a direct GET for fetching a single match by ID.
+ *
+ * New job sub-resources (e.g. job stages) can be added as additional
+ * resource branches inside jobSubresourceExecute.
+ */
+
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
@@ -9,12 +24,13 @@ export async function jobSubresourceExecute(
 	operation: string,
 	i: number,
 ): Promise<IDataObject | IDataObject[]> {
-	if (resource === 'jobMatch') {
-		const jobId = getManatalIdParameter.call(this, 'jobId', i);
+	const jobId = getManatalIdParameter.call(this, 'jobId', i);
 
+	if (resource === 'jobMatch') {
 		if (operation === 'getMany') {
 			return handleGetMany.call(this, `/jobs/${jobId}/matches/`, i, {});
-		} else if (operation === 'get') {
+		}
+		if (operation === 'get') {
 			const matchId = getManatalIdParameter.call(this, 'matchId', i);
 			return manatalApiRequest.call(this, 'GET', `/jobs/${jobId}/matches/${matchId}/`);
 		}

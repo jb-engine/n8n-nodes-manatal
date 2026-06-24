@@ -1,3 +1,28 @@
+/**
+ * ManatalTrigger.node.ts
+ *
+ * Webhook trigger node for the Manatal ATS integration.
+ * Starts an n8n workflow automatically when a selected event occurs in Manatal.
+ *
+ * Supported events: candidate created/updated, contact created/updated,
+ * job status updated, match created, match moved (pipeline stage change).
+ *
+ * Lifecycle:
+ * - On workflow activation: checkExists() verifies a matching webhook is already
+ *   registered; if not, create() POSTs a new webhook to the Manahook API and
+ *   stores the webhook ID in workflow static data for future reference.
+ * - On incoming POST: webhook() passes the raw request body straight through
+ *   as the workflow's trigger data.
+ * - On workflow deactivation: delete() removes the webhook from Manatal using
+ *   the stored ID. A 404 response is treated as success (already removed).
+ *
+ * Static data is used to persist the webhook ID between n8n restarts without
+ * requiring a database or external store.
+ *
+ * EVENT_MAP translates n8n-facing event names (e.g. 'matchMoved') to the
+ * model/action pair that the Manatal webhook API expects.
+ */
+
 import type {
 	IDataObject,
 	IHookFunctions,
@@ -32,27 +57,27 @@ const EVENT_MAP: Record<string, { model: string; action: string }> = {
 	jobStatusUpdate: { model: 'job', action: 'status_update' },
 };
 
-function clearWebhookStaticData(staticData: IDataObject): void {
+/**
+ * Clears or sets webhook static data in one call.
+ * Called with no data argument to clear (on delete/mismatch),
+ * or with data to store the newly registered webhook's identity.
+ *
+ * model and action are intentionally NOT stored — they are always
+ * derivable from EVENT_MAP[event] and storing them would create a
+ * second source of truth that could drift from the event key.
+ */
+function setWebhookStaticData(
+	staticData: IDataObject,
+	data?: { id: string | number; url: string; event: string },
+): void {
 	delete staticData.webhookId;
 	delete staticData.webhookUrl;
 	delete staticData.webhookEvent;
-	delete staticData.webhookModel;
-	delete staticData.webhookAction;
-}
-
-function storeWebhookStaticData(
-	staticData: IDataObject,
-	webhookId: string | number,
-	webhookUrl: string,
-	event: string,
-	model: string,
-	action: string,
-): void {
-	staticData.webhookId = webhookId;
-	staticData.webhookUrl = webhookUrl;
-	staticData.webhookEvent = event;
-	staticData.webhookModel = model;
-	staticData.webhookAction = action;
+	if (data) {
+		staticData.webhookId = data.id;
+		staticData.webhookUrl = data.url;
+		staticData.webhookEvent = data.event;
+	}
 }
 
 export class ManatalTrigger implements INodeType {
@@ -145,9 +170,7 @@ export class ManatalTrigger implements INodeType {
 				if (
 					!webhookId ||
 					staticData.webhookUrl !== webhookUrl ||
-					staticData.webhookEvent !== event ||
-					staticData.webhookModel !== model ||
-					staticData.webhookAction !== action
+					staticData.webhookEvent !== event
 				) {
 					return false;
 				}
@@ -155,7 +178,8 @@ export class ManatalTrigger implements INodeType {
 				let existing: ManatalWebhook[];
 				try {
 					const response = await manatalWebhookApiRequest.call(this, 'GET', '/webhooks/');
-					existing = (response as unknown as ManatalWebhook[]) ?? [];
+					const raw = response as unknown as ManatalWebhook[] | { results: ManatalWebhook[] };
+					existing = Array.isArray(raw) ? raw : ((raw.results as ManatalWebhook[]) ?? []);
 				} catch {
 					return false;
 				}
@@ -169,7 +193,7 @@ export class ManatalTrigger implements INodeType {
 				);
 
 				if (!matchingHookExists) {
-					clearWebhookStaticData(staticData);
+					setWebhookStaticData(staticData);
 				}
 
 				return matchingHookExists;
@@ -188,7 +212,11 @@ export class ManatalTrigger implements INodeType {
 				});
 
 				if (!response.id) return false;
-				storeWebhookStaticData(staticData, response.id as string | number, webhookUrl, event, model, action);
+				setWebhookStaticData(staticData, {
+					id: response.id as string | number,
+					url: webhookUrl,
+					event,
+				});
 				return true;
 			},
 
@@ -197,7 +225,7 @@ export class ManatalTrigger implements INodeType {
 				const webhookId = staticData.webhookId as number | undefined;
 
 				if (!webhookId) {
-					clearWebhookStaticData(staticData);
+					setWebhookStaticData(staticData);
 					return true;
 				}
 
@@ -207,21 +235,25 @@ export class ManatalTrigger implements INodeType {
 					// 404 means the webhook was already removed from Manatal — treat as success
 					const httpError = error as { httpCode?: string; statusCode?: number };
 					if (httpError.httpCode === '404' || httpError.statusCode === 404) {
-						clearWebhookStaticData(staticData);
+						setWebhookStaticData(staticData);
 						return true;
 					}
 					return false;
 				}
 
-				clearWebhookStaticData(staticData);
+				setWebhookStaticData(staticData);
 				return true;
 			},
 		},
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
+		const body = this.getBodyData() as IDataObject;
+		if (!body || Object.keys(body).length === 0) {
+			return { webhookResponse: '' };
+		}
 		return {
-			workflowData: [[{ json: this.getBodyData() as IDataObject }]],
+			workflowData: [[{ json: body }]],
 		};
 	}
 }

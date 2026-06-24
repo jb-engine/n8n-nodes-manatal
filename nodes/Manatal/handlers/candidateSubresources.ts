@@ -1,58 +1,24 @@
+/**
+ * handlers/candidateSubresources.ts
+ *
+ * Handles candidate-specific sub-resources that don't fit the generic
+ * note/attachment pattern:
+ *
+ *   candidateMatch     — read-only view of pipeline matches for a candidate
+ *                        (paginated, getMany + get by ID)
+ *   candidateResume    — non-standard URL shape (/resume/ not /resumes/),
+ *                        raw-array response, supports get and upload only
+ *   candidateSocialMedia — raw-array list, supports optional platform filter,
+ *                          create and get by ID
+ *
+ * All operations first resolve the parent candidate ID from the 'candidateId'
+ * node parameter, then build the sub-resource URL from there.
+ */
+
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
 import { asArray, getManatalIdParameter, handleGetMany, manatalApiRequest } from '../GenericFunctions';
-
-type SubresourceConfig = {
-	endpoint: (candidateId: string | number) => string;
-	idParam: string;
-	listMode: 'raw' | 'paginated';
-	createParams?: string[];
-};
-
-const SUBRESOURCE_CONFIG: Record<string, SubresourceConfig> = {
-	candidateNationality: {
-		endpoint: (id) => `/candidates/${id}/nationalities/`,
-		idParam: 'nationalityId',
-		listMode: 'paginated',
-		createParams: ['country'],
-	},
-	candidateMatch: {
-		endpoint: (id) => `/candidates/${id}/matches/`,
-		idParam: 'matchId',
-		listMode: 'paginated',
-	},
-};
-
-async function handleSubresource(
-	ctx: IExecuteFunctions,
-	config: SubresourceConfig,
-	candidateId: string | number,
-	operation: string,
-	i: number,
-): Promise<IDataObject | IDataObject[]> {
-	if (operation === 'getMany') {
-		if (config.listMode === 'raw')
-			return asArray(await manatalApiRequest.call(ctx, 'GET', config.endpoint(candidateId)));
-		return handleGetMany.call(ctx, config.endpoint(candidateId), i, {});
-	}
-	if (operation === 'get') {
-		const itemId = getManatalIdParameter.call(ctx, config.idParam, i);
-		return manatalApiRequest.call(ctx, 'GET', `${config.endpoint(candidateId)}${itemId}/`);
-	}
-	if (operation === 'create' || operation === 'add') {
-		const body: IDataObject = {};
-		for (const param of config.createParams ?? []) body[param] = ctx.getNodeParameter(param, i);
-		const additionalFields = ctx.getNodeParameter('additionalFields', i, {}) as IDataObject;
-		return manatalApiRequest.call(ctx, 'POST', config.endpoint(candidateId), { ...body, ...additionalFields });
-	}
-	if (operation === 'update') {
-		const itemId = getManatalIdParameter.call(ctx, config.idParam, i);
-		const updateFields = ctx.getNodeParameter('updateFields', i) as IDataObject;
-		return manatalApiRequest.call(ctx, 'PATCH', `${config.endpoint(candidateId)}${itemId}/`, updateFields);
-	}
-	throw new NodeOperationError(ctx.getNode(), `Unknown operation "${operation}"`, { itemIndex: i });
-}
 
 export async function candidateSubresourceExecute(
 	this: IExecuteFunctions,
@@ -62,20 +28,29 @@ export async function candidateSubresourceExecute(
 ): Promise<IDataObject | IDataObject[]> {
 	const candidateId = getManatalIdParameter.call(this, 'candidateId', i);
 
-	const config = SUBRESOURCE_CONFIG[resource];
-	if (config) return handleSubresource(this, config, candidateId, operation, i);
+	// Match: read-only view of pipeline matches for a candidate
+	if (resource === 'candidateMatch') {
+		if (operation === 'getMany') {
+			return handleGetMany.call(this, `/candidates/${candidateId}/matches/`, i, {});
+		}
+		if (operation === 'get') {
+			const matchId = getManatalIdParameter.call(this, 'matchId', i);
+			return manatalApiRequest.call(this, 'GET', `/candidates/${candidateId}/matches/${matchId}/`);
+		}
+	}
 
-	// resume — non-standard URL shape (no trailing ID segment on list), no update
+	// Resume: non-standard URL (/resume/ singular), raw array response, no update
 	if (resource === 'candidateResume') {
-		if (operation === 'get')
+		if (operation === 'get') {
 			return asArray(await manatalApiRequest.call(this, 'GET', `/candidates/${candidateId}/resume/`));
+		}
 		if (operation === 'upload') {
 			const resumeFile = this.getNodeParameter('resume_file', i) as string;
 			return manatalApiRequest.call(this, 'POST', `/candidates/${candidateId}/resume/`, { resume_file: resumeFile });
 		}
 	}
 
-	// socialMedia — optional platform filter on getMany, no update
+	// Social media: raw array list with optional platform filter, no update
 	if (resource === 'candidateSocialMedia') {
 		if (operation === 'getMany') {
 			const filters = this.getNodeParameter('filters', i) as IDataObject;

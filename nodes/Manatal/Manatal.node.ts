@@ -108,7 +108,7 @@ export class Manatal implements INodeType {
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
-				name: 'manatalOpenAPIKey',
+				name: 'manatalOpenAPIKeyApi',
 				required: true,
 			},
 		],
@@ -462,6 +462,7 @@ export class Manatal implements INodeType {
 					returnData.push(...errorItem);
 					continue;
 				}
+				// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
 				throw error;
 			}
 		}

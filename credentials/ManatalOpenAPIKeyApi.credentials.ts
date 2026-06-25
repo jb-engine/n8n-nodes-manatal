@@ -20,8 +20,8 @@ import type {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class ManatalOpenAPIKey implements ICredentialType {
-	name = 'manatalOpenAPIKey';
+export class ManatalOpenAPIKeyApi implements ICredentialType {
+	name = 'manatalOpenAPIKeyApi';
 
 	displayName = 'Manatal Open API Key';
 

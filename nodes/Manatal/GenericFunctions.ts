@@ -57,7 +57,7 @@ export async function manatalApiRequest(
 	try {
 		return await this.helpers.httpRequestWithAuthentication.call(
 			this,
-			'manatalOpenAPIKey',
+			'manatalOpenAPIKeyApi',
 			options,
 		);
 	} catch (error) {
@@ -69,6 +69,7 @@ export async function manatalApiRequest(
 				.map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : String(msgs)}`)
 				.join('\n');
 		}
+		// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
 		throw error;
 	}
 }

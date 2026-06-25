@@ -84,7 +84,7 @@ export class ManatalTrigger implements INodeType {
 		defaults: { name: 'Manatal Trigger' },
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
-		credentials: [{ name: 'manatalOpenAPIKey', required: true }],
+		credentials: [{ name: 'manatalOpenAPIKeyApi', required: true }],
 		webhooks: [
 			{
 				name: 'default',

@@ -407,8 +407,7 @@ export class Manatal implements INodeType {
 							value: match.id as string | number,
 						};
 					}),
-					paginationToken:
-						filtered.length > 0 && response.next ? String(currentPage + 1) : undefined,
+					paginationToken: response.next ? String(currentPage + 1) : undefined,
 				};
 			},
 		},

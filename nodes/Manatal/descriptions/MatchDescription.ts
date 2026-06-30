@@ -1,10 +1,5 @@
-﻿import type { INodeProperties } from 'n8n-workflow';
-import {
-	CANDIDATE_MODES,
-	JOB_MODES,
-	MATCH_MODES,
-	USER_MODES,
-} from './SharedFields';
+import type { INodeProperties } from 'n8n-workflow';
+import { CANDIDATE_MODES, JOB_MODES, MATCH_MODES, USER_MODES } from './SharedFields';
 
 export const matchOperations: INodeProperties[] = [
 	{
@@ -244,14 +239,6 @@ export const matchFields: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Custom Fields',
-				name: 'custom_fields',
-				type: 'json',
-				default: '{}',
-				description:
-					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
-			},
-			{
 				displayName: 'Dropped At',
 				name: 'dropped_at',
 				type: 'dateTime',
@@ -336,14 +323,6 @@ export const matchFields: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Custom Fields',
-				name: 'custom_fields',
-				type: 'json',
-				default: '{}',
-				description:
-					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
-			},
-			{
 				displayName: 'Dropped At',
 				name: 'dropped_at',
 				type: 'dateTime',
@@ -399,7 +378,8 @@ export const matchFields: INodeProperties[] = [
 				name: 'job_pipeline_stage',
 				type: 'options',
 				default: '',
-				description: 'Pipeline stage to move this match to. Loads stages from the pipeline assigned to the selected match.',
+				description:
+					'Pipeline stage to move this match to. Loads stages from the pipeline assigned to the selected match.',
 				typeOptions: {
 					loadOptionsMethod: 'getMatchPipelineStages',
 					loadOptionsDependsOn: ['matchId'],

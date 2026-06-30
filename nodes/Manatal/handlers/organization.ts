@@ -7,8 +7,7 @@
  * Notable behaviour:
  * - GetMany: normalises creator_id and owner_id locator fields to plain
  *   numeric IDs before forwarding them as query parameters.
- * - Create / Update: normalises the owner locator and parses custom_fields
- *   from a JSON string if the user supplied it as text.
+ * - Create / Update: normalises the owner locator before sending the request.
  */
 
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
@@ -19,7 +18,6 @@ import {
 	handleGetMany,
 	manatalApiRequest,
 	normalizeLocatorField,
-	parseJsonField,
 } from '../GenericFunctions';
 
 export async function organizationExecute(
@@ -44,7 +42,6 @@ export async function organizationExecute(
 		const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 		normalizeLocatorField(additionalFields, 'owner');
 		const body: IDataObject = { name, ...additionalFields };
-		parseJsonField(body, 'custom_fields');
 		return manatalApiRequest.call(this, 'POST', '/organizations/', body);
 	}
 
@@ -52,9 +49,12 @@ export async function organizationExecute(
 		const id = getManatalIdParameter.call(this, 'organizationId', i);
 		const updateFields = this.getNodeParameter('updateFields', i) as IDataObject;
 		normalizeLocatorField(updateFields, 'owner');
-		parseJsonField(updateFields, 'custom_fields');
 		return manatalApiRequest.call(this, 'PATCH', `/organizations/${id}/`, updateFields);
 	}
 
-	throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "organization"`, { itemIndex: i });
+	throw new NodeOperationError(
+		this.getNode(),
+		`Unknown operation "${operation}" for resource "organization"`,
+		{ itemIndex: i },
+	);
 }

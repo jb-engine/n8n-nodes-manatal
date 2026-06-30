@@ -19,7 +19,6 @@ import {
 	handleGetMany,
 	manatalApiRequest,
 	normalizeLocatorField,
-	parseJsonField,
 	remapLocatorField,
 } from '../GenericFunctions';
 
@@ -45,7 +44,6 @@ export async function contactExecute(
 		const organization = getManatalIdParameter.call(this, 'organization', i);
 		const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 		const body: IDataObject = { full_name: fullName, organization, ...additionalFields };
-		parseJsonField(body, 'custom_fields');
 		return manatalApiRequest.call(this, 'POST', '/contacts/', body);
 	}
 
@@ -53,9 +51,12 @@ export async function contactExecute(
 		const id = getManatalIdParameter.call(this, 'contactId', i);
 		const updateFields = this.getNodeParameter('updateFields', i) as IDataObject;
 		normalizeLocatorField(updateFields, 'organization');
-		parseJsonField(updateFields, 'custom_fields');
 		return manatalApiRequest.call(this, 'PATCH', `/contacts/${id}/`, updateFields);
 	}
 
-	throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "contact"`, { itemIndex: i });
+	throw new NodeOperationError(
+		this.getNode(),
+		`Unknown operation "${operation}" for resource "contact"`,
+		{ itemIndex: i },
+	);
 }

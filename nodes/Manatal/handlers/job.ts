@@ -8,7 +8,7 @@
  *   'organization_id' for the API query string (same pattern as contact.ts).
  *   'creator_id' and 'owner_id' are also locator fields that need normalising.
  * - Create: position_name and organization are required fields.
- * - Update: normalises the owner locator and parses custom_fields JSON.
+ * - Update: normalises the owner locator and date fields before patching.
  */
 
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
@@ -20,7 +20,6 @@ import {
 	manatalApiRequest,
 	normalizeDateField,
 	normalizeLocatorField,
-	parseJsonField,
 	remapLocatorField,
 } from '../GenericFunctions';
 
@@ -50,7 +49,6 @@ export async function jobExecute(
 		normalizeLocatorField(additionalFields, 'owner');
 		const body: IDataObject = { position_name: positionName, organization, ...additionalFields };
 		normalizeDateField(body, 'expected_close_at');
-		parseJsonField(body, 'custom_fields');
 		return manatalApiRequest.call(this, 'POST', '/jobs/', body);
 	}
 
@@ -59,9 +57,12 @@ export async function jobExecute(
 		const updateFields = this.getNodeParameter('updateFields', i) as IDataObject;
 		normalizeLocatorField(updateFields, 'owner');
 		normalizeDateField(updateFields, 'expected_close_at');
-		parseJsonField(updateFields, 'custom_fields');
 		return manatalApiRequest.call(this, 'PATCH', `/jobs/${id}/`, updateFields);
 	}
 
-	throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "job"`, { itemIndex: i });
+	throw new NodeOperationError(
+		this.getNode(),
+		`Unknown operation "${operation}" for resource "job"`,
+		{ itemIndex: i },
+	);
 }

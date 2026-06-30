@@ -36,5 +36,9 @@ export async function jobSubresourceExecute(
 		}
 	}
 
-	throw new NodeOperationError(this.getNode(), `Unknown operation "${operation}" for resource "${resource}"`, { itemIndex: i });
+	throw new NodeOperationError(
+		this.getNode(),
+		`Unknown operation "${operation}" for resource "${resource}"`,
+		{ itemIndex: i },
+	);
 }

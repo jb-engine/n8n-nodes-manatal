@@ -361,14 +361,6 @@ export const jobFields: INodeProperties[] = [
 				description: 'Currency used for the salary range fields',
 			},
 			{
-				displayName: 'Custom Fields',
-				name: 'custom_fields',
-				type: 'json',
-				default: '{}',
-				description:
-					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
-			},
-			{
 				displayName: 'Description',
 				name: 'description',
 				type: 'string',
@@ -555,14 +547,6 @@ export const jobFields: INodeProperties[] = [
 				default: '',
 				typeOptions: { loadOptionsMethod: 'getCurrencies' },
 				description: 'Currency used for the salary range fields',
-			},
-			{
-				displayName: 'Custom Fields',
-				name: 'custom_fields',
-				type: 'json',
-				default: '{}',
-				description:
-					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
 			},
 			{
 				displayName: 'Description',

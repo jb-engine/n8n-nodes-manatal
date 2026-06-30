@@ -343,14 +343,6 @@ export const candidateFields: INodeProperties[] = [
 				description: 'Job title the candidate currently holds',
 			},
 			{
-				displayName: 'Custom Fields',
-				name: 'custom_fields',
-				type: 'json',
-				default: '{}',
-				description:
-					'Custom field values as a JSON object. Must be a full object. Partial updates will overwrite existing values.',
-			},
-			{
 				displayName: 'Description',
 				name: 'description',
 				type: 'string',
@@ -509,14 +501,6 @@ export const candidateFields: INodeProperties[] = [
 				default: '',
 				placeholder: 'Software Engineer',
 				description: 'Job title the candidate currently holds',
-			},
-			{
-				displayName: 'Custom Fields',
-				name: 'custom_fields',
-				type: 'json',
-				default: '{}',
-				description:
-					'Custom field values as a JSON object. Must be a full object - partial updates will overwrite existing values.',
 			},
 			{
 				displayName: 'Description',

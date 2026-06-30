@@ -57,13 +57,10 @@ export async function manatalApiRequest(
 	try {
 		return await this.helpers.httpRequestWithAuthentication.call(
 			this,
-			'manatalOpenAPIKey',
+			'manatalOpenAPIKeyApi',
 			options,
 		);
 	} catch (error) {
-		// n8n pre-constructs a NodeApiError before our catch runs and stores the parsed
-		// API response body at error.context.data. We format that into `description` so
-		// n8n surfaces it as the detail line beneath the main error message in the UI.
 		const data = ((error as JsonObject).context as JsonObject | undefined)?.data as
 			| JsonObject
 			| undefined;
@@ -77,10 +74,6 @@ export async function manatalApiRequest(
 	}
 }
 
-/**
- * Convenience wrapper for the Manatal webhook API (manahook.api.manatal.com).
- * Used exclusively by ManatalTrigger.node.ts to register and delete webhooks.
- */
 export async function manatalWebhookApiRequest(
 	this: IExecuteFunctions | ILoadOptionsFunctions | IHookFunctions,
 	method: IHttpRequestMethods,
@@ -186,27 +179,6 @@ export function asArray(response: unknown): IDataObject[] {
 }
 
 /**
- * Parses a stringified JSON field in-place.
- *
- * Manatal's `custom_fields` property must be sent as a JSON object, but users
- * often supply it as a JSON string. Parsing it before the request prevents a
- * confusing API validation error. If the string is malformed we leave it
- * unchanged — the API will respond with a clear error message.
- *
- * @param obj - The request body object to mutate
- * @param key - The field name to parse (typically 'custom_fields')
- */
-export function parseJsonField(obj: IDataObject, key: string): void {
-	if (typeof obj[key] === 'string') {
-		try {
-			obj[key] = JSON.parse(obj[key] as string) as IDataObject;
-		} catch {
-			// leave as-is; API will return a validation error with a clear message
-		}
-	}
-}
-
-/**
  * Normalises a date field in-place to the YYYY-MM-DD format Manatal requires.
  *
  * n8n's dateTime fields return ISO 8601 strings (e.g. "2024-01-15T00:00:00.000Z").
@@ -220,18 +192,6 @@ export function normalizeDateField(obj: IDataObject, key: string): void {
 	}
 }
 
-/**
- * Extracts a numeric or string ID from a resourceLocator field value.
- *
- * n8n's resourceLocator fields produce either a raw number, a plain string,
- * or a nested object { mode, value }. This function normalises all those
- * shapes into the bare ID that the Manatal API expects.
- *
- * Examples:
- *   42           → 42
- *   '42'         → '42'
- *   { value: 42 } → 42
- */
 export function normalizeManatalId(value: unknown): string | number {
 	if (value && typeof value === 'object' && 'value' in value) {
 		return normalizeManatalId((value as IDataObject).value);
@@ -239,7 +199,10 @@ export function normalizeManatalId(value: unknown): string | number {
 
 	if (typeof value === 'number') return value;
 
-	return String(value ?? '').trim();
+	const stringValue = String(value ?? '').trim();
+	// Extract a numeric ID from a URL path (e.g. "https://…/candidates/123/" → "123")
+	const urlMatch = stringValue.match(/\/(\d+)\/?(?:[?#].*)?$/);
+	return urlMatch ? urlMatch[1] : stringValue;
 }
 
 /**

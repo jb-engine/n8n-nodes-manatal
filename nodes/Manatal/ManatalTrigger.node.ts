@@ -14,7 +14,7 @@
  * - On incoming POST: webhook() passes the raw request body straight through
  *   as the workflow's trigger data.
  * - On workflow deactivation: delete() removes the webhook from Manatal using
- *   the stored ID. A 404 response is treated as success (already removed).
+ *   the stored ID.
  *
  * Static data is used to persist the webhook ID between n8n restarts without
  * requiring a database or external store.
@@ -57,15 +57,6 @@ const EVENT_MAP: Record<string, { model: string; action: string }> = {
 	jobStatusUpdate: { model: 'job', action: 'status_update' },
 };
 
-/**
- * Clears or sets webhook static data in one call.
- * Called with no data argument to clear (on delete/mismatch),
- * or with data to store the newly registered webhook's identity.
- *
- * model and action are intentionally NOT stored — they are always
- * derivable from EVENT_MAP[event] and storing them would create a
- * second source of truth that could drift from the event key.
- */
 function setWebhookStaticData(
 	staticData: IDataObject,
 	data?: { id: string | number; url: string; event: string },
@@ -93,7 +84,7 @@ export class ManatalTrigger implements INodeType {
 		defaults: { name: 'Manatal Trigger' },
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
-		credentials: [{ name: 'manatalOpenAPIKey', required: true }],
+		credentials: [{ name: 'manatalOpenAPIKeyApi', required: true }],
 		webhooks: [
 			{
 				name: 'default',
@@ -232,7 +223,6 @@ export class ManatalTrigger implements INodeType {
 				try {
 					await manatalWebhookApiRequest.call(this, 'DELETE', `/webhooks/${webhookId}/`);
 				} catch (error) {
-					// 404 means the webhook was already removed from Manatal — treat as success
 					const httpError = error as { httpCode?: string; statusCode?: number };
 					if (httpError.httpCode === '404' || httpError.statusCode === 404) {
 						setWebhookStaticData(staticData);
@@ -248,12 +238,8 @@ export class ManatalTrigger implements INodeType {
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
-		const body = this.getBodyData() as IDataObject;
-		if (!body || Object.keys(body).length === 0) {
-			return { webhookResponse: '' };
-		}
 		return {
-			workflowData: [[{ json: body }]],
+			workflowData: [[{ json: this.getBodyData() as IDataObject }]],
 		};
 	}
 }

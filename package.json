@@ -4,8 +4,8 @@
 	"description": "n8n community node for Manatal — automate your ATS workflows by connecting candidates, jobs, matches, contacts, and organisations to 400+ services",
 	"license": "MIT",
 	"author": {
-		"name": "Manatal",
-		"email": "support@manatal.com"
+		"name": "Aaron Stern",
+		"email": "aaron.stern@manatal.com"
 	},
 	"repository": {
 		"type": "git",
@@ -21,7 +21,7 @@
 	"n8n": {
 		"n8nNodesApiVersion": 1,
 		"credentials": [
-			"dist/credentials/ManatalOpenAPIKey.credentials.js"
+			"dist/credentials/ManatalOpenAPIKeyApi.credentials.js"
 		],
 		"nodes": [
 			"dist/nodes/Manatal/Manatal.node.js",

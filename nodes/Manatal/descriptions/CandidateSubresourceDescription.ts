@@ -1,4 +1,4 @@
-﻿import type { INodeProperties } from 'n8n-workflow';
+import type { INodeProperties } from 'n8n-workflow';
 import { CANDIDATE_MODES, MATCH_MODES } from './SharedFields';
 
 //	CANDIDATE RESUME

@@ -84,7 +84,6 @@ async function loadSubresourceOptions(
 	return (Array.isArray(items) ? items : []).map(mapFn);
 }
 
-// Industries endpoint returns either a raw array or a { count, results[] } envelope
 async function fetchIndustries(ctx: ILoadOptionsFunctions): Promise<IDataObject[]> {
 	const response = await manatalApiRequest.call(ctx, 'GET', '/industries/');
 	return (
@@ -109,7 +108,7 @@ export class Manatal implements INodeType {
 		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
-				name: 'manatalOpenAPIKey',
+				name: 'manatalOpenAPIKeyApi',
 				required: true,
 			},
 		],
@@ -463,7 +462,7 @@ export class Manatal implements INodeType {
 					continue;
 				}
 				// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
-				throw error; // already a NodeApiError or NodeOperationError from handlers
+				throw error;
 			}
 		}
 

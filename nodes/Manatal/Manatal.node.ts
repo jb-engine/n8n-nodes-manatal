@@ -27,8 +27,9 @@ import type {
 	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
+	JsonObject,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeApiError, NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { attachmentFields, attachmentOperations } from './descriptions/AttachmentDescription';
 import { candidateFields, candidateOperations } from './descriptions/CandidateDescription';
@@ -69,7 +70,7 @@ async function loadSubresourceOptions(
 	const resource = ctx.getNodeParameter('resource') as string;
 	let parentInfo: { apiBase: string; idParam: string };
 	try {
-		parentInfo = parentResourcePath(resource);
+		parentInfo = parentResourcePath.call(ctx, resource);
 	} catch {
 		return [];
 	}
@@ -443,6 +444,11 @@ export class Manatal implements INodeType {
 					responseData = await jobSubresourceExecute.call(this, resource, operation, i);
 				} else {
 					throw new NodeOperationError(this.getNode(), `Unknown resource "${resource}"`, {
+						description:
+							'The selected "Resource" value isn\'t handled by this node. Reselect a ' +
+							'resource from the dropdown, or if you\'re building this workflow from ' +
+							'raw JSON/expressions, check the resource name against the node\'s ' +
+							'supported resources.',
 						itemIndex: i,
 					});
 				}
@@ -455,14 +461,35 @@ export class Manatal implements INodeType {
 			} catch (error) {
 				if (this.continueOnFail()) {
 					const errorItem = this.helpers.constructExecutionMetaData(
-						[{ json: { error: (error as Error).message } }],
+						[
+							{
+								json: {
+									error: (error as Error).message,
+									description: (error as JsonObject).description as string | undefined,
+								},
+							},
+						],
 						{ itemData: { item: i } },
 					);
 					returnData.push(...errorItem);
 					continue;
 				}
-				// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
-				throw error;
+
+				// NodeApiError/NodeOperationError constructors short-circuit and return
+				// the same instance when given an error of their own type, silently
+				// dropping itemIndex passed via options — set it on the instance
+				// directly first so n8n can associate the failure with this item.
+				if (error instanceof NodeApiError || error instanceof NodeOperationError) {
+					error.context.itemIndex = i;
+				}
+
+				// Preserve NodeOperationError (validation/config errors from handlers,
+				// e.g. "Unsupported operation") instead of relabelling it as an API
+				// error; only genuine API/network failures become NodeApiError.
+				if (error instanceof NodeOperationError) {
+					throw new NodeOperationError(this.getNode(), error, { itemIndex: i });
+				}
+				throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 			}
 		}
 

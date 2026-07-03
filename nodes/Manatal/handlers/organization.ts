@@ -55,6 +55,11 @@ export async function organizationExecute(
 	throw new NodeOperationError(
 		this.getNode(),
 		`Unknown operation "${operation}" for resource "organization"`,
-		{ itemIndex: i },
+		{
+			description:
+				'The selected "Operation" isn\'t supported for the "Organization" resource. ' +
+				'Reselect an operation from the dropdown.',
+			itemIndex: i,
+		},
 	);
 }

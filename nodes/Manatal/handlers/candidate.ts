@@ -73,6 +73,11 @@ export async function candidateExecute(
 	throw new NodeOperationError(
 		this.getNode(),
 		`Unknown operation "${operation}" for resource "candidate"`,
-		{ itemIndex: i },
+		{
+			description:
+				'The selected "Operation" isn\'t supported for the "Candidate" resource. ' +
+				'Reselect an operation from the dropdown.',
+			itemIndex: i,
+		},
 	);
 }

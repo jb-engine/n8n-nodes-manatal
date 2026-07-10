@@ -39,6 +39,9 @@ export async function jobSubresourceExecute(
 	throw new NodeOperationError(
 		this.getNode(),
 		`Unknown operation "${operation}" for resource "${resource}"`,
-		{ itemIndex: i },
+		{
+			description: `The selected "Operation" isn't supported for the "${resource}" resource. Reselect an operation from the dropdown.`,
+			itemIndex: i,
+		},
 	);
 }

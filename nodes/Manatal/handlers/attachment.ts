@@ -31,7 +31,7 @@ export async function attachmentExecute(
 	i: number,
 ): Promise<IDataObject | IDataObject[]> {
 	// Resolve parent resource (e.g. 'jobAttachment' → { apiBase: 'jobs', idParam: 'jobId' })
-	const { apiBase, idParam } = parentResourcePath(resource);
+	const { apiBase, idParam } = parentResourcePath.call(this, resource);
 	const parentId = getManatalIdParameter.call(this, idParam, i);
 
 	if (operation === 'getMany') {
@@ -71,6 +71,9 @@ export async function attachmentExecute(
 	throw new NodeOperationError(
 		this.getNode(),
 		`Unknown operation "${operation}" for resource "${resource}"`,
-		{ itemIndex: i },
+		{
+			description: `The selected "Operation" isn't supported for the "${resource}" resource. Reselect an operation from the dropdown.`,
+			itemIndex: i,
+		},
 	);
 }

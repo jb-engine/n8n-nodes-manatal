@@ -68,6 +68,11 @@ export async function matchExecute(
 	throw new NodeOperationError(
 		this.getNode(),
 		`Unknown operation "${operation}" for resource "match"`,
-		{ itemIndex: i },
+		{
+			description:
+				'The selected "Operation" isn\'t supported for the "Match" resource. ' +
+				'Reselect an operation from the dropdown.',
+			itemIndex: i,
+		},
 	);
 }

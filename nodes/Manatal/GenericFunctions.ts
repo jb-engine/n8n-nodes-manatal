@@ -7,7 +7,7 @@
  * stay thin and don't repeat boilerplate.
  */
 
-import { sleep } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError, sleep } from 'n8n-workflow';
 import type {
 	IDataObject,
 	IExecuteFunctions,
@@ -20,6 +20,24 @@ import type {
 
 const BASE_URL = 'https://api.manatal.com/open/v3';
 const WEBHOOK_BASE_URL = 'https://manahook.api.manatal.com/v1';
+
+/**
+ * Plain-English messages for the HTTP status codes Manatal's API documents.
+ * See https://developers.manatal.com/ Error Handling section.
+ */
+const HTTP_STATUS_MESSAGES: Record<string, string> = {
+	'400': 'Bad Request: the request was unacceptable, often due to a missing required parameter.',
+	'401': 'Unauthorized: no valid API key was provided.',
+	'402': 'Request Failed: the parameters were valid but the request failed.',
+	'403': "Forbidden: the API key doesn't have permission to perform this request.",
+	'404': "Not Found: the requested resource doesn't exist.",
+	'409': 'Conflict: the request conflicts with another request.',
+	'429': 'Too Many Requests: the API rate limit was exceeded.',
+	'500': "Server Error: something went wrong on Manatal's end.",
+	'502': "Server Error: something went wrong on Manatal's end.",
+	'503': "Server Error: something went wrong on Manatal's end.",
+	'504': "Server Error: something went wrong on Manatal's end.",
+};
 
 /**
  * Makes an authenticated HTTP request to the Manatal API.
@@ -64,13 +82,17 @@ export async function manatalApiRequest(
 		const data = ((error as JsonObject).context as JsonObject | undefined)?.data as
 			| JsonObject
 			| undefined;
-		if (data && typeof data === 'object' && !Array.isArray(data)) {
-			(error as JsonObject).description = Object.entries(data)
-				.map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : String(msgs)}`)
-				.join('\n');
+
+		const httpCode = String((error as { httpCode?: string }).httpCode ?? '');
+		const message = HTTP_STATUS_MESSAGES[httpCode] ?? 'Manatal API request failed.';
+		const description = data ? JSON.stringify(data, null, 2) : undefined;
+
+		if (error instanceof NodeApiError) {
+			error.message = message;
+			error.description = description;
 		}
-		// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
-		throw error;
+
+		throw new NodeApiError(this.getNode(), error as JsonObject, { message, description });
 	}
 }
 
@@ -120,14 +142,12 @@ export async function manatalApiRequestAllItems(
 			const httpError = error as { httpCode?: string };
 			if (String(httpError.httpCode) === '429') {
 				if (++retries > MAX_RETRIES) {
-					// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
-					throw error;
+					throw new NodeApiError(this.getNode(), error as JsonObject);
 				}
 				await sleep(RETRY_AFTER_MS);
 				continue;
 			}
-			// eslint-disable-next-line @n8n/community-nodes/require-node-api-error
-			throw error;
+			throw new NodeApiError(this.getNode(), error as JsonObject);
 		}
 
 		retries = 0;
@@ -280,8 +300,22 @@ const PARENT_RESOURCE_MAP: Record<string, { apiBase: string; idParam: string }> 
 		),
 	);
 
-export function parentResourcePath(resource: string): { apiBase: string; idParam: string } {
+export function parentResourcePath(
+	this: IExecuteFunctions | ILoadOptionsFunctions,
+	resource: string,
+): { apiBase: string; idParam: string } {
 	const entry = PARENT_RESOURCE_MAP[resource];
-	if (!entry) throw new Error(`No parent resource path mapping found for resource "${resource}"`);
+	if (!entry) {
+		throw new NodeOperationError(
+			this.getNode(),
+			`No parent resource path mapping found for resource "${resource}"`,
+			{
+				description:
+					'This resource is not one of the supported note/attachment parent types ' +
+					'(candidate, job, match, organization, contact). This usually indicates a ' +
+					'node configuration issue rather than something fixable from the input data.',
+			},
+		);
+	}
 	return entry;
 }

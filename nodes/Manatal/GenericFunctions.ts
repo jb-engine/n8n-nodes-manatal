@@ -28,15 +28,15 @@ const WEBHOOK_BASE_URL = 'https://manahook.api.manatal.com/v1';
 const HTTP_STATUS_MESSAGES: Record<string, string> = {
 	'400': 'Bad Request: the request was unacceptable, often due to a missing required parameter.',
 	'401': 'Unauthorized: no valid API key was provided.',
-	'402': 'Request Failed: the parameters were valid but the request failed.',
+	'402': 'Request Not Completed: the parameters were valid, but Manatal could not process this request.',
 	'403': "Forbidden: the API key doesn't have permission to perform this request.",
 	'404': "Not Found: the requested resource doesn't exist.",
 	'409': 'Conflict: the request conflicts with another request.',
 	'429': 'Too Many Requests: the API rate limit was exceeded.',
-	'500': "Server Error: something went wrong on Manatal's end.",
-	'502': "Server Error: something went wrong on Manatal's end.",
-	'503': "Server Error: something went wrong on Manatal's end.",
-	'504': "Server Error: something went wrong on Manatal's end.",
+	'500': "Manatal Service Unavailable: something went wrong on Manatal's end. Try again in a few minutes.",
+	'502': "Manatal Service Unavailable: something went wrong on Manatal's end. Try again in a few minutes.",
+	'503': "Manatal Service Unavailable: something went wrong on Manatal's end. Try again in a few minutes.",
+	'504': "Manatal Service Unavailable: something went wrong on Manatal's end. Try again in a few minutes.",
 };
 
 /**
@@ -84,8 +84,11 @@ export async function manatalApiRequest(
 			| undefined;
 
 		const httpCode = String((error as { httpCode?: string }).httpCode ?? '');
-		const message = HTTP_STATUS_MESSAGES[httpCode] ?? 'Manatal API request failed.';
-		const description = data ? JSON.stringify(data, null, 2) : undefined;
+		const message = HTTP_STATUS_MESSAGES[httpCode] ?? 'Manatal API request was not successful.';
+		const description = data
+			? "Check the values in this node's parameters against the details below, then retry.\n\n" +
+				JSON.stringify(data, null, 2)
+			: undefined;
 
 		if (error instanceof NodeApiError) {
 			error.message = message;
@@ -308,7 +311,7 @@ export function parentResourcePath(
 	if (!entry) {
 		throw new NodeOperationError(
 			this.getNode(),
-			`No parent resource path mapping found for resource "${resource}"`,
+			`No parent resource path mapping found for resource '${resource}'`,
 			{
 				description:
 					'This resource is not one of the supported note/attachment parent types ' +

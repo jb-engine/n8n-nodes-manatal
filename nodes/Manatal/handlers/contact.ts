@@ -56,10 +56,10 @@ export async function contactExecute(
 
 	throw new NodeOperationError(
 		this.getNode(),
-		`Unknown operation "${operation}" for resource "contact"`,
+		`Unknown operation '${operation}' for resource 'contact'`,
 		{
 			description:
-				'The selected "Operation" isn\'t supported for the "Contact" resource. ' +
+				"The selected 'Operation' isn't supported for the 'Contact' resource. " +
 				'Reselect an operation from the dropdown.',
 			itemIndex: i,
 		},

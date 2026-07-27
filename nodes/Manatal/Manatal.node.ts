@@ -98,7 +98,7 @@ export class Manatal implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Manatal',
 		name: 'manatal',
-		icon: 'file:assets/manatal.svg',
+		icon: { light: 'file:assets/manatal.svg', dark: 'file:assets/manatal.dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
@@ -443,11 +443,11 @@ export class Manatal implements INodeType {
 				} else if (resource === 'jobMatch') {
 					responseData = await jobSubresourceExecute.call(this, resource, operation, i);
 				} else {
-					throw new NodeOperationError(this.getNode(), `Unknown resource "${resource}"`, {
+					throw new NodeOperationError(this.getNode(), `Unknown resource '${resource}'`, {
 						description:
-							'The selected "Resource" value isn\'t handled by this node. Reselect a ' +
-							'resource from the dropdown, or if you\'re building this workflow from ' +
-							'raw JSON/expressions, check the resource name against the node\'s ' +
+							"The selected 'Resource' value isn't handled by this node. Reselect a " +
+							"resource from the dropdown, or if you're building this workflow from " +
+							"raw JSON/expressions, check the resource name against the node's " +
 							'supported resources.',
 						itemIndex: i,
 					});

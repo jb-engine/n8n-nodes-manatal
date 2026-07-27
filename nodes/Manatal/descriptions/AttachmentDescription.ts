@@ -27,13 +27,13 @@ export const attachmentOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create an attachment',
+				action: 'Create attachment',
 				description: 'Upload a new attachment',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get an attachment',
+				action: 'Get attachment',
 				description: 'Retrieve an attachment by ID',
 			},
 			{
@@ -45,7 +45,7 @@ export const attachmentOperations: INodeProperties[] = [
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Update an attachment',
+				action: 'Update attachment',
 				description: 'Update an attachment',
 			},
 		],
@@ -110,7 +110,7 @@ export const attachmentFields: INodeProperties[] = [
 	//  Attachment ID (get / update / delete)
 
 	{
-		displayName: 'Attachment',
+		displayName: 'Attachment Name or ID',
 		name: 'attachmentId',
 		type: 'options',
 		required: true,
@@ -118,7 +118,8 @@ export const attachmentFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['get', 'update'] },
 		},
-		description: 'Attachment to retrieve or update. Loads from the selected parent resource.',
+		description:
+			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: {
 			loadOptionsMethod: 'getAttachmentOptions',
 			loadOptionsDependsOn: ['candidateId', 'contactId', 'jobId', 'matchId', 'organizationId'],
@@ -133,7 +134,7 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'offer_letter.pdf',
+		placeholder: 'e.g. offer_letter.pdf',
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['create'] } },
 		description: 'Display name for this attachment',
 	},
@@ -143,7 +144,7 @@ export const attachmentFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'https://example.com/offer_letter.pdf',
+		placeholder: 'e.g. https://example.com/offer_letter.pdf',
 		displayOptions: { show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['create'] } },
 		description: 'Publicly accessible URL pointing to the file to attach',
 	},
@@ -203,7 +204,7 @@ export const attachmentFields: INodeProperties[] = [
 				name: 'file',
 				type: 'string',
 				default: '',
-				placeholder: 'https://example.com/offer_letter.pdf',
+				placeholder: 'e.g. https://example.com/offer_letter.pdf',
 				description: 'Publicly accessible URL pointing to the replacement file',
 			},
 			{
@@ -211,7 +212,7 @@ export const attachmentFields: INodeProperties[] = [
 				name: 'name',
 				type: 'string',
 				default: '',
-				placeholder: 'offer_letter.pdf',
+				placeholder: 'e.g. offer_letter.pdf',
 				description: 'Display name for this attachment',
 			},
 		],

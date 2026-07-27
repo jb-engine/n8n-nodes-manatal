@@ -26,17 +26,17 @@ export const noteOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a note',
+				action: 'Create note',
 				description: 'Create a new note',
 			},
-			{ name: 'Get', value: 'get', action: 'Get a note', description: 'Retrieve a note by ID' },
+			{ name: 'Get', value: 'get', action: 'Get note', description: 'Retrieve a note by ID' },
 			{
 				name: 'Get Many',
 				value: 'getMany',
 				action: 'Get many notes',
 				description: 'Retrieve all notes',
 			},
-			{ name: 'Update', value: 'update', action: 'Update a note', description: 'Update a note' },
+			{ name: 'Update', value: 'update', action: 'Update note', description: 'Update a note' },
 		],
 		default: 'getMany',
 	},
@@ -95,7 +95,7 @@ export const noteFields: INodeProperties[] = [
 	},
 
 	{
-		displayName: 'Note',
+		displayName: 'Note Name or ID',
 		name: 'noteId',
 		type: 'options',
 		required: true,
@@ -103,7 +103,8 @@ export const noteFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ALL_NOTE_RESOURCES, operation: ['get', 'update'] },
 		},
-		description: 'Note to retrieve or update. Loads from the selected parent resource.',
+		description:
+			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 		typeOptions: {
 			loadOptionsMethod: 'getNoteOptions',
 			loadOptionsDependsOn: ['candidateId', 'contactId', 'jobId', 'matchId', 'organizationId'],

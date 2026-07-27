@@ -9,7 +9,7 @@ export const jobMatchViewOperations: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['jobMatch'] } },
 		options: [
-			{ name: 'Get', value: 'get', action: 'Get a match', description: 'Retrieve a match by ID' },
+			{ name: 'Get', value: 'get', action: 'Get match', description: 'Retrieve a match by ID' },
 			{
 				name: 'Get Many',
 				value: 'getMany',
@@ -48,14 +48,14 @@ export const jobMatchViewFields: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		displayOptions: { show: { resource: ['jobMatch'], operation: ['getMany'] } },
-		description: 'Fetch every pipeline match for this job instead of stopping at the limit',
+		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
 		typeOptions: { minValue: 1, maxValue: 100 },
-		default: 10,
+		default: 50,
 		displayOptions: {
 			show: { resource: ['jobMatch'], operation: ['getMany'], returnAll: [false] },
 		},

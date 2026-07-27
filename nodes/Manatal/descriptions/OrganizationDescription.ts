@@ -14,13 +14,13 @@ export const organizationOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create an organization',
+				action: 'Create organization',
 				description: 'Create a new organization',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get an organization',
+				action: 'Get organization',
 				description: 'Retrieve an organization by ID',
 			},
 			{
@@ -32,7 +32,7 @@ export const organizationOperations: INodeProperties[] = [
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Update an organization',
+				action: 'Update organization',
 				description: 'Update an organization',
 			},
 		],
@@ -63,14 +63,14 @@ export const organizationFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['organization'], operation: ['getMany'] },
 		},
-		description: 'Fetch every matching organization instead of stopping at the limit',
+		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
 		typeOptions: { minValue: 1, maxValue: 100 },
-		default: 10,
+		default: 50,
 		displayOptions: {
 			show: { resource: ['organization'], operation: ['getMany'], returnAll: [false] },
 		},
@@ -91,7 +91,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Return organizations whose address contains this text (partial match)',
 			},
 			{
@@ -121,7 +121,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Return organizations with this exact external system ID',
 			},
 			{
@@ -137,7 +137,7 @@ export const organizationFields: INodeProperties[] = [
 				type: 'boolean',
 				default: true,
 				description:
-					'Set to true to return only public organizations; set to false for private only',
+					'Whether to return only public organizations; set to false for private only',
 			},
 			{
 				displayName: 'Is Visible',
@@ -145,14 +145,14 @@ export const organizationFields: INodeProperties[] = [
 				type: 'boolean',
 				default: true,
 				description:
-					'Set to true to return only visible organizations; set to false for hidden only',
+					'Whether to return only visible organizations; set to false for hidden only',
 			},
 			{
 				displayName: 'Name',
 				name: 'name',
 				type: 'string',
 				default: '',
-				placeholder: 'Acme Corp',
+				placeholder: 'e.g. Acme Corp',
 				description: 'Return organizations whose name contains this text (partial match)',
 			},
 			{
@@ -182,7 +182,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'website',
 				type: 'string',
 				default: '',
-				placeholder: 'https://example.com',
+				placeholder: 'e.g. https://example.com',
 				description: 'Return organizations whose website URL contains this text',
 			},
 		],
@@ -195,7 +195,7 @@ export const organizationFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'Acme Corp',
+		placeholder: 'e.g. Acme Corp',
 		displayOptions: {
 			show: { resource: ['organization'], operation: ['create'] },
 		},
@@ -216,7 +216,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Street address of the organization',
 			},
 			{
@@ -232,7 +232,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this organization in an external system',
 			},
 			{
@@ -248,7 +248,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'website',
 				type: 'string',
 				default: '',
-				placeholder: 'https://example.com',
+				placeholder: 'e.g. https://example.com',
 				description: "URL of the organization's website",
 			},
 		],
@@ -282,7 +282,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Street address of the organization',
 			},
 			{
@@ -298,7 +298,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this organization in an external system',
 			},
 			{
@@ -306,7 +306,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'name',
 				type: 'string',
 				default: '',
-				placeholder: 'Acme Corp',
+				placeholder: 'e.g. Acme Corp',
 				description: 'Name of the organization',
 			},
 			{
@@ -322,7 +322,7 @@ export const organizationFields: INodeProperties[] = [
 				name: 'website',
 				type: 'string',
 				default: '',
-				placeholder: 'https://example.com',
+				placeholder: 'e.g. https://example.com',
 				description: "URL of the organization's website",
 			},
 		],

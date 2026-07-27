@@ -14,13 +14,13 @@ export const candidateOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a candidate',
+				action: 'Create candidate',
 				description: 'Create a new candidate',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a candidate',
+				action: 'Get candidate',
 				description: 'Retrieve a candidate by ID',
 			},
 			{
@@ -32,7 +32,7 @@ export const candidateOperations: INodeProperties[] = [
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Update a candidate',
+				action: 'Update candidate',
 				description: "Update partially a candidate's details",
 			},
 		],
@@ -78,14 +78,14 @@ export const candidateFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['candidate'], operation: ['getMany'] },
 		},
-		description: 'Fetch every matching candidate instead of stopping at the limit',
+		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
 		typeOptions: { minValue: 1, maxValue: 100 },
-		default: 10,
+		default: 50,
 		displayOptions: {
 			show: { resource: ['candidate'], operation: ['getMany'], returnAll: [false] },
 		},
@@ -106,7 +106,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Return candidates whose address contains this text (partial match)',
 			},
 			{
@@ -128,7 +128,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'candidate_location',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'Return candidates whose location contains this text (partial match)',
 			},
 			{
@@ -136,7 +136,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'candidate_tags',
 				type: 'string',
 				default: '',
-				placeholder: '12123 ,34332,561568',
+				placeholder: 'e.g. 12123 ,34332,561568',
 				description: 'Return candidates that have all of the specified tag IDs (comma-separated)',
 			},
 			{
@@ -158,7 +158,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'current_company',
 				type: 'string',
 				default: '',
-				placeholder: 'Acme Corp',
+				placeholder: 'e.g. Acme Corp',
 				description: 'Return candidates whose current company contains this text (partial match)',
 			},
 			{
@@ -166,7 +166,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'current_position',
 				type: 'string',
 				default: '',
-				placeholder: 'Software Engineer',
+				placeholder: 'e.g. Software Engineer',
 				description: 'Return candidates whose current position contains this text (partial match)',
 			},
 			{
@@ -181,7 +181,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'email',
 				type: 'string',
 				default: '',
-				placeholder: 'jane.smith@company.com',
+				placeholder: 'e.g. jane.smith@company.com',
 				description: 'Return candidates with this exact email address',
 			},
 			{
@@ -189,7 +189,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Return candidates with this exact external system ID',
 			},
 			{
@@ -197,7 +197,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'full_name',
 				type: 'string',
 				default: '',
-				placeholder: 'Jane Smith',
+				placeholder: 'e.g. Jane Smith',
 				description: 'Return candidates whose name contains this text (partial match)',
 			},
 			{
@@ -220,7 +220,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'latest_degree',
 				type: 'string',
 				default: '',
-				placeholder: 'Bachelor of Science',
+				placeholder: 'e.g. Bachelor of Science',
 				description: 'Return candidates whose latest degree contains this text (partial match)',
 			},
 			{
@@ -228,7 +228,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'latest_university',
 				type: 'string',
 				default: '',
-				placeholder: 'Stanford University',
+				placeholder: 'e.g. Stanford University',
 				description: 'Return candidates whose latest university contains this text (partial match)',
 			},
 			{
@@ -244,7 +244,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'phone_number',
 				type: 'string',
 				default: '',
-				placeholder: '+1 555 000 0001',
+				placeholder: 'e.g. +1 555 000 0001',
 				description: 'Return candidates with this exact phone number',
 			},
 			{
@@ -279,7 +279,7 @@ export const candidateFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'Jane Smith',
+		placeholder: 'e.g. Jane Smith',
 		displayOptions: {
 			show: { resource: ['candidate'], operation: ['create'] },
 		},
@@ -300,7 +300,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Street address of the candidate',
 			},
 			{
@@ -316,14 +316,14 @@ export const candidateFields: INodeProperties[] = [
 				type: 'boolean',
 				default: false,
 				description:
-					'Enable to record that the candidate consented to data processing under privacy regulations (GDPR, LGPD, CCPA)',
+					'Whether to record that the candidate consented to data processing under privacy regulations (GDPR, LGPD, CCPA)',
 			},
 			{
 				displayName: 'Current Company',
 				name: 'current_company',
 				type: 'string',
 				default: '',
-				placeholder: 'Acme Corp',
+				placeholder: 'e.g. Acme Corp',
 				description: "Name of the candidate's current employer",
 			},
 			{
@@ -331,7 +331,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'current_department',
 				type: 'string',
 				default: '',
-				placeholder: 'Engineering',
+				placeholder: 'e.g. Engineering',
 				description: 'Department the candidate currently works in',
 			},
 			{
@@ -339,7 +339,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'current_position',
 				type: 'string',
 				default: '',
-				placeholder: 'Software Engineer',
+				placeholder: 'e.g. Software Engineer',
 				description: 'Job title the candidate currently holds',
 			},
 			{
@@ -354,7 +354,7 @@ export const candidateFields: INodeProperties[] = [
 				displayName: 'Email',
 				name: 'email',
 				type: 'string',
-				placeholder: 'jane.smith@company.com',
+				placeholder: 'e.g. jane.smith@company.com',
 				default: '',
 				description: "Candidate's primary email address",
 			},
@@ -363,7 +363,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this candidate in an external system',
 			},
 			{
@@ -379,7 +379,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'latest_degree',
 				type: 'string',
 				default: '',
-				placeholder: 'Bachelor of Science',
+				placeholder: 'e.g. Bachelor of Science',
 				description: 'Most recent academic degree obtained by the candidate',
 			},
 			{
@@ -387,7 +387,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'latest_university',
 				type: 'string',
 				default: '',
-				placeholder: 'Stanford University',
+				placeholder: 'e.g. Stanford University',
 				description: 'Most recent university or institution attended by the candidate',
 			},
 			{
@@ -403,7 +403,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'phone_number',
 				type: 'string',
 				default: '',
-				placeholder: '+1 555 000 0001',
+				placeholder: 'e.g. +1 555 000 0001',
 				description: "Candidate's primary phone number",
 			},
 			{
@@ -411,7 +411,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'source_other',
 				type: 'string',
 				default: '',
-				description: 'Additional source detail â€" only used when Source Type is "Other"',
+				description: 'Additional source detail — only used when Source Type is "Other"',
 			},
 			{
 				displayName: 'Source Type',
@@ -426,7 +426,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'zipcode',
 				type: 'string',
 				default: '',
-				placeholder: '10001',
+				placeholder: 'e.g. 10001',
 				description: 'Postal code for the candidate address',
 			},
 		],
@@ -460,7 +460,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Street address of the candidate',
 			},
 			{
@@ -476,14 +476,14 @@ export const candidateFields: INodeProperties[] = [
 				type: 'boolean',
 				default: false,
 				description:
-					'Enable to record that the candidate consented to data processing under privacy regulations (GDPR / LGPD / CCPA)',
+					'Whether to record that the candidate consented to data processing under privacy regulations (GDPR / LGPD / CCPA)',
 			},
 			{
 				displayName: 'Current Company',
 				name: 'current_company',
 				type: 'string',
 				default: '',
-				placeholder: 'Acme Corp',
+				placeholder: 'e.g. Acme Corp',
 				description: "Name of the candidate's current employer",
 			},
 			{
@@ -491,7 +491,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'current_department',
 				type: 'string',
 				default: '',
-				placeholder: 'Engineering',
+				placeholder: 'e.g. Engineering',
 				description: 'Department the candidate currently works in',
 			},
 			{
@@ -499,7 +499,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'current_position',
 				type: 'string',
 				default: '',
-				placeholder: 'Software Engineer',
+				placeholder: 'e.g. Software Engineer',
 				description: 'Job title the candidate currently holds',
 			},
 			{
@@ -514,7 +514,7 @@ export const candidateFields: INodeProperties[] = [
 				displayName: 'Email',
 				name: 'email',
 				type: 'string',
-				placeholder: 'jane.smith@company.com',
+				placeholder: 'e.g. jane.smith@company.com',
 				default: '',
 				description: "Candidate's primary email address",
 			},
@@ -523,7 +523,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this candidate in an external system',
 			},
 			{
@@ -531,7 +531,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'full_name',
 				type: 'string',
 				default: '',
-				placeholder: 'Jane Smith',
+				placeholder: 'e.g. Jane Smith',
 				description: "Candidate's full name",
 			},
 			{
@@ -547,7 +547,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'latest_degree',
 				type: 'string',
 				default: '',
-				placeholder: 'Bachelor of Science',
+				placeholder: 'e.g. Bachelor of Science',
 				description: 'Most recent academic degree obtained by the candidate',
 			},
 			{
@@ -555,7 +555,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'latest_university',
 				type: 'string',
 				default: '',
-				placeholder: 'Stanford University',
+				placeholder: 'e.g. Stanford University',
 				description: 'Most recent university or institution attended by the candidate',
 			},
 			{
@@ -571,7 +571,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'phone_number',
 				type: 'string',
 				default: '',
-				placeholder: '+1 555 000 0001',
+				placeholder: 'e.g. +1 555 000 0001',
 				description: "Candidate's primary phone number",
 			},
 			{
@@ -594,7 +594,7 @@ export const candidateFields: INodeProperties[] = [
 				name: 'zipcode',
 				type: 'string',
 				default: '',
-				placeholder: '10001',
+				placeholder: 'e.g. 10001',
 				description: 'Postal code for the candidate address',
 			},
 		],

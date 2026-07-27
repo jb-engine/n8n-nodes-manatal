@@ -38,13 +38,13 @@ export const jobOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a job',
+				action: 'Create job',
 				description: 'Create a new job posting',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a job',
+				action: 'Get job',
 				description: 'Retrieve a job by ID',
 			},
 			{
@@ -56,7 +56,7 @@ export const jobOperations: INodeProperties[] = [
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Update a job',
+				action: 'Update job',
 				description: 'Update a job posting',
 			},
 		],
@@ -87,14 +87,14 @@ export const jobFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['job'], operation: ['getMany'] },
 		},
-		description: 'Fetch every matching job instead of stopping at the limit',
+		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
 		typeOptions: { minValue: 1, maxValue: 100 },
-		default: 10,
+		default: 50,
 		displayOptions: {
 			show: { resource: ['job'], operation: ['getMany'], returnAll: [false] },
 		},
@@ -115,7 +115,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Return jobs whose office address contains this text (partial match)',
 			},
 			{
@@ -123,7 +123,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'city',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'Return jobs located in this city (partial match)',
 			},
 			{
@@ -175,7 +175,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Return jobs with this exact external system ID',
 			},
 			{
@@ -205,14 +205,15 @@ export const jobFields: INodeProperties[] = [
 				name: 'is_published',
 				type: 'boolean',
 				default: true,
-				description: 'Set to true to return only published jobs; set to false for unpublished only',
+				description:
+					'Whether to return only published jobs; set to false for unpublished only',
 			},
 			{
 				displayName: 'Is Remote',
 				name: 'is_remote',
 				type: 'boolean',
 				default: false,
-				description: 'Set to true to return only remote jobs; set to false for on-site only',
+				description: 'Whether to return only remote jobs; set to false for on-site only',
 			},
 			{
 				displayName: 'Open At (From)',
@@ -249,7 +250,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'position_name',
 				type: 'string',
 				default: '',
-				placeholder: 'Software Engineer',
+				placeholder: 'e.g. Software Engineer',
 				description: 'Return jobs whose position name contains this text (partial match)',
 			},
 			{
@@ -257,7 +258,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'state',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'Return jobs located in this state (partial match)',
 			},
 			{
@@ -292,7 +293,7 @@ export const jobFields: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		placeholder: 'Senior Software Engineer',
+		placeholder: 'e.g. Senior Software Engineer',
 		displayOptions: {
 			show: { resource: ['job'], operation: ['create'] },
 		},
@@ -325,7 +326,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Street address of the office where the job will take place',
 			},
 			{
@@ -333,7 +334,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'city',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'City of the office where the job will take place',
 			},
 			{
@@ -349,16 +350,17 @@ export const jobFields: INodeProperties[] = [
 				name: 'country',
 				type: 'string',
 				default: '',
-				placeholder: 'United States',
+				placeholder: 'e.g. United States',
 				description: 'Country of the office where the job will take place',
 			},
 			{
-				displayName: 'Currency',
+				displayName: 'Currency Name or ID',
 				name: 'currency',
 				type: 'options',
 				default: '',
 				typeOptions: { loadOptionsMethod: 'getCurrencies' },
-				description: 'Currency used for the salary range fields',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},
 			{
 				displayName: 'Description',
@@ -380,7 +382,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this job in an external system',
 			},
 			{
@@ -399,40 +401,41 @@ export const jobFields: INodeProperties[] = [
 				description: 'Number of open positions available for this job',
 			},
 			{
-				displayName: 'Industry',
+				displayName: 'Industry Name or ID',
 				name: 'industry',
 				type: 'options',
 				default: '',
 				typeOptions: { loadOptionsMethod: 'getIndustries' },
-				description: 'Industry sector this job belongs to',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},
 			{
 				displayName: 'Is Pinned In Career Page',
 				name: 'is_pinned_in_career_page',
 				type: 'boolean',
 				default: false,
-				description: 'Pin this job at the top of the public career page listing',
+				description: 'Whether to pin this job at the top of the public career page listing',
 			},
 			{
 				displayName: 'Is Published',
 				name: 'is_published',
 				type: 'boolean',
 				default: false,
-				description: 'Publish this job on the career page so candidates can apply',
+				description: 'Whether to publish this job on the career page so candidates can apply',
 			},
 			{
 				displayName: 'Is Remote',
 				name: 'is_remote',
 				type: 'boolean',
 				default: false,
-				description: 'Mark this position as fully remote',
+				description: 'Whether to mark this position as fully remote',
 			},
 			{
 				displayName: 'Is Salary Visible',
 				name: 'is_salary_visible',
 				type: 'boolean',
 				default: false,
-				description: 'Display the salary range to candidates on the career page',
+				description: 'Whether to display the salary range to candidates on the career page',
 			},
 			{
 				displayName: 'Owner',
@@ -447,7 +450,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'salary_max',
 				type: 'string',
 				default: '',
-				placeholder: '80000',
+				placeholder: 'e.g. 80000',
 				description: 'Maximum salary offered for this position',
 			},
 			{
@@ -455,7 +458,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'salary_min',
 				type: 'string',
 				default: '',
-				placeholder: '80000',
+				placeholder: 'e.g. 80000',
 				description: 'Minimum salary offered for this position',
 			},
 			{
@@ -463,7 +466,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'state',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'State or province of the office where the job will take place',
 			},
 			{
@@ -479,7 +482,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'zipcode',
 				type: 'string',
 				default: '',
-				placeholder: '10001',
+				placeholder: 'e.g. 10001',
 				description: 'Postal code of the office where the job will take place',
 			},
 		],
@@ -513,7 +516,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'address',
 				type: 'string',
 				default: '',
-				placeholder: '123 Main Street',
+				placeholder: 'e.g. 123 Main Street',
 				description: 'Street address of the office where the job will take place',
 			},
 			{
@@ -521,7 +524,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'city',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'City of the office where the job will take place',
 			},
 			{
@@ -537,16 +540,17 @@ export const jobFields: INodeProperties[] = [
 				name: 'country',
 				type: 'string',
 				default: '',
-				placeholder: 'United States',
+				placeholder: 'e.g. United States',
 				description: 'Country of the office where the job will take place',
 			},
 			{
-				displayName: 'Currency',
+				displayName: 'Currency Name or ID',
 				name: 'currency',
 				type: 'options',
 				default: '',
 				typeOptions: { loadOptionsMethod: 'getCurrencies' },
-				description: 'Currency used for the salary range fields',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},
 			{
 				displayName: 'Description',
@@ -568,7 +572,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this job in an external system',
 			},
 			{
@@ -587,40 +591,41 @@ export const jobFields: INodeProperties[] = [
 				description: 'Number of open positions available for this job',
 			},
 			{
-				displayName: 'Industry',
+				displayName: 'Industry Name or ID',
 				name: 'industry',
 				type: 'options',
 				default: '',
 				typeOptions: { loadOptionsMethod: 'getIndustries' },
-				description: 'Industry sector this job belongs to',
+				description:
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 			},
 			{
 				displayName: 'Is Pinned In Career Page',
 				name: 'is_pinned_in_career_page',
 				type: 'boolean',
 				default: false,
-				description: 'Pin this job at the top of the career page',
+				description: 'Whether to pin this job at the top of the career page',
 			},
 			{
 				displayName: 'Is Published',
 				name: 'is_published',
 				type: 'boolean',
 				default: false,
-				description: 'Publish this job on the career page',
+				description: 'Whether to publish this job on the career page',
 			},
 			{
 				displayName: 'Is Remote',
 				name: 'is_remote',
 				type: 'boolean',
 				default: false,
-				description: 'Mark this position as fully remote',
+				description: 'Whether to mark this position as fully remote',
 			},
 			{
 				displayName: 'Is Salary Visible',
 				name: 'is_salary_visible',
 				type: 'boolean',
 				default: false,
-				description: 'Display the salary range to candidates on the career page',
+				description: 'Whether to display the salary range to candidates on the career page',
 			},
 			{
 				displayName: 'Owner',
@@ -635,7 +640,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'position_name',
 				type: 'string',
 				default: '',
-				placeholder: 'Senior Software Engineer',
+				placeholder: 'e.g. Senior Software Engineer',
 				description: 'Title of the job position being filled',
 			},
 			{
@@ -643,7 +648,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'salary_max',
 				type: 'string',
 				default: '',
-				placeholder: '80000',
+				placeholder: 'e.g. 80000',
 				description: 'Maximum salary offered for this position',
 			},
 			{
@@ -651,7 +656,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'salary_min',
 				type: 'string',
 				default: '',
-				placeholder: '80000',
+				placeholder: 'e.g. 80000',
 				description: 'Minimum salary offered for this position',
 			},
 			{
@@ -659,7 +664,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'state',
 				type: 'string',
 				default: '',
-				placeholder: 'New York',
+				placeholder: 'e.g. New York',
 				description: 'State or province of the office where the job will take place',
 			},
 			{
@@ -675,7 +680,7 @@ export const jobFields: INodeProperties[] = [
 				name: 'zipcode',
 				type: 'string',
 				default: '',
-				placeholder: '10001',
+				placeholder: 'e.g. 10001',
 				description: 'Postal code of the office where the job will take place',
 			},
 		],

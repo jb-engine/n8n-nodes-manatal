@@ -14,13 +14,13 @@ export const matchOperations: INodeProperties[] = [
 			{
 				name: 'Create',
 				value: 'create',
-				action: 'Create a match',
+				action: 'Create match',
 				description: 'Creates a new match',
 			},
 			{
 				name: 'Get',
 				value: 'get',
-				action: 'Get a match',
+				action: 'Get match',
 				description: 'Retrieve a match by ID',
 			},
 			{
@@ -32,7 +32,7 @@ export const matchOperations: INodeProperties[] = [
 			{
 				name: 'Update',
 				value: 'update',
-				action: 'Update a match',
+				action: 'Update match',
 				description: 'Update a match (e.g. move pipeline stage)',
 			},
 		],
@@ -63,14 +63,14 @@ export const matchFields: INodeProperties[] = [
 		displayOptions: {
 			show: { resource: ['match'], operation: ['getMany'] },
 		},
-		description: 'Fetch every match instead of stopping at the limit',
+		description: 'Whether to return all results or only up to a given limit',
 	},
 	{
 		displayName: 'Limit',
 		name: 'limit',
 		type: 'number',
 		typeOptions: { minValue: 1, maxValue: 100 },
-		default: 10,
+		default: 50,
 		displayOptions: {
 			show: { resource: ['match'], operation: ['getMany'], returnAll: [false] },
 		},
@@ -119,7 +119,7 @@ export const matchFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Return matches with this exact external system ID',
 			},
 			{
@@ -169,7 +169,7 @@ export const matchFields: INodeProperties[] = [
 				name: 'stage__in',
 				type: 'string',
 				default: '',
-				placeholder: '12124,34123,56123',
+				placeholder: 'e.g. 12124,34123,56123',
 				description: 'Return matches in any of these pipeline stage IDs (comma-separated)',
 			},
 			{
@@ -250,7 +250,7 @@ export const matchFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this match in an external system',
 			},
 			{
@@ -272,7 +272,8 @@ export const matchFields: INodeProperties[] = [
 				name: 'is_active',
 				type: 'boolean',
 				default: true,
-				description: 'Keep this match active in the pipeline; disable to mark it as inactive',
+				description:
+					'Whether to keep this match active in the pipeline; disable to mark it as inactive',
 			},
 			{
 				displayName: 'Offer At',
@@ -334,7 +335,7 @@ export const matchFields: INodeProperties[] = [
 				name: 'external_id',
 				type: 'string',
 				default: '',
-				placeholder: 'EXT-00142',
+				placeholder: 'e.g. EXT-00142',
 				description: 'Identifier for this match in an external system',
 			},
 			{
@@ -356,7 +357,8 @@ export const matchFields: INodeProperties[] = [
 				name: 'is_active',
 				type: 'boolean',
 				default: true,
-				description: 'Keep this match active in the pipeline; disable to mark it as inactive',
+				description:
+					'Whether to keep this match active in the pipeline; disable to mark it as inactive',
 			},
 			{
 				displayName: 'Offer At',
@@ -374,12 +376,12 @@ export const matchFields: INodeProperties[] = [
 				description: 'User responsible for managing this pipeline entry',
 			},
 			{
-				displayName: 'Stage',
+				displayName: 'Stage Name or ID',
 				name: 'job_pipeline_stage',
 				type: 'options',
 				default: '',
 				description:
-					'Pipeline stage to move this match to. Loads stages from the pipeline assigned to the selected match.',
+					'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getMatchPipelineStages',
 					loadOptionsDependsOn: ['matchId'],

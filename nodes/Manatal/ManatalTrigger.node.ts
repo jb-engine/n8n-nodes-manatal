@@ -75,7 +75,7 @@ export class ManatalTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Manatal Trigger',
 		name: 'manatalTrigger',
-		icon: 'file:assets/manatal.svg',
+		icon: { light: 'file:assets/manatal.svg', dark: 'file:assets/manatal.dark.svg' },
 		group: ['trigger'],
 		version: 1,
 		description: 'Starts a workflow when a selected Manatal event occurs',

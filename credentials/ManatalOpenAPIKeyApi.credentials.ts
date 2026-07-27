@@ -23,7 +23,7 @@ import type {
 export class ManatalOpenAPIKeyApi implements ICredentialType {
 	name = 'manatalOpenAPIKeyApi';
 
-	displayName = 'Manatal Open API Key';
+	displayName = 'Manatal Open API Key API';
 
 	icon = 'file:../nodes/Manatal/assets/manatal.svg' as const;
 

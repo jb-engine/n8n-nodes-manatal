@@ -1,4 +1,4 @@
-import communityPlugin from '@n8n/eslint-plugin-community-nodes';
+import { config as n8nConfig } from '@n8n/node-cli/eslint';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 
@@ -6,7 +6,7 @@ export default [
 	{
 		ignores: ['dist/**', 'scripts/**'],
 	},
-	communityPlugin.configs.recommended,
+	...n8nConfig,
 	{
 		files: ['**/*.ts'],
 		languageOptions: {

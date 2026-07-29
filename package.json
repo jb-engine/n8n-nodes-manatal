@@ -52,6 +52,8 @@
 		"n8n-core": "2.16.1",
 		"n8n-workflow": "2.16.0",
 		"prettier": "^3.0.0",
-		"typescript": "~5.1.0"
+		"typescript": "~5.1.0",
+		"@emnapi/core": "*",
+		"@emnapi/runtime": "*"
 	}
 }

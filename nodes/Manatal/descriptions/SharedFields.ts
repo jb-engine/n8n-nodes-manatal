@@ -3,10 +3,11 @@ import type { INodeProperties } from 'n8n-workflow';
 type Modes = NonNullable<INodeProperties['modes']>;
 
 function idMode(resourceName: string): Modes[number] {
-	return {
+	const mode = {
 		displayName: 'By ID',
 		name: 'id',
-		type: 'string',
+		type: 'string' as const,
+		default: '',
 		placeholder: 'e.g. 4291037',
 		validation: [
 			{
@@ -18,19 +19,22 @@ function idMode(resourceName: string): Modes[number] {
 			},
 		],
 	};
+	return mode;
 }
 
 function listMode(displayName: string, searchListMethod: string): Modes[number] {
-	return {
+	const mode = {
 		displayName,
 		name: 'list',
-		type: 'list',
+		type: 'list' as const,
+		default: '',
 		typeOptions: {
 			searchListMethod,
 			searchFilterRequired: false,
 			searchable: true,
 		},
 	};
+	return mode;
 }
 
 export const CANDIDATE_MODES: Modes = [

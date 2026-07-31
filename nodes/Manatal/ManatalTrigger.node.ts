@@ -171,7 +171,10 @@ export class ManatalTrigger implements INodeType {
 					const response = await manatalWebhookApiRequest.call(this, 'GET', '/webhooks/');
 					const raw = response as unknown as ManatalWebhook[] | { results: ManatalWebhook[] };
 					existing = Array.isArray(raw) ? raw : ((raw.results as ManatalWebhook[]) ?? []);
-				} catch {
+				} catch (error) {
+					this.logger.debug('Failed to fetch existing webhooks, assuming webhook does not exist', {
+						error,
+					});
 					return false;
 				}
 

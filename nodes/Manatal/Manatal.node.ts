@@ -62,11 +62,10 @@ import { matchExecute } from './handlers/match';
 import { noteExecute } from './handlers/note';
 import { organizationExecute } from './handlers/organization';
 
-async function loadSubresourceOptions(
+async function loadSubresourceItems(
 	ctx: ILoadOptionsFunctions,
 	subpath: string,
-	mapFn: (item: IDataObject) => INodePropertyOptions,
-): Promise<INodePropertyOptions[]> {
+): Promise<IDataObject[]> {
 	const resource = ctx.getNodeParameter('resource') as string;
 	let parentInfo: { apiBase: string; idParam: string };
 	try {
@@ -77,12 +76,37 @@ async function loadSubresourceOptions(
 	const { apiBase, idParam } = parentInfo;
 	const parentId = normalizeManatalId(ctx.getNodeParameter(idParam) as IDataObject | string);
 	if (!parentId) return [];
-	const items = (await manatalApiRequest.call(
+	const response = await manatalApiRequest.call(
 		ctx,
 		'GET',
 		`/${apiBase}/${parentId}/${subpath}`,
-	)) as unknown as IDataObject[];
-	return (Array.isArray(items) ? items : []).map(mapFn);
+	);
+	return Array.isArray(response)
+		? response
+		: (((response as IDataObject).results as IDataObject[] | undefined) ?? []);
+}
+
+async function loadSubresourceOptions(
+	ctx: ILoadOptionsFunctions,
+	subpath: string,
+	mapFn: (item: IDataObject) => INodePropertyOptions,
+): Promise<INodePropertyOptions[]> {
+	const items = await loadSubresourceItems(ctx, subpath);
+	return items.map(mapFn);
+}
+
+function noteTimestamp(note: IDataObject): number {
+	const rawDate = note.created_at as string | undefined;
+	const timestamp = rawDate ? new Date(rawDate).getTime() : 0;
+	return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function formatNoteOptionName(note: IDataObject): string {
+	const id = String(note.id);
+	const rawDate = note.created_at as string | undefined;
+	const date = rawDate ? new Date(rawDate) : undefined;
+	const dateLabel = date && !Number.isNaN(date.getTime()) ? date.toISOString().slice(0, 10) : 'No created date';
+	return `${dateLabel} | Note #${id}`;
 }
 
 async function fetchIndustries(ctx: ILoadOptionsFunctions): Promise<IDataObject[]> {
@@ -228,10 +252,16 @@ export class Manatal implements INodeType {
 			},
 
 			async getNoteOptions(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				return loadSubresourceOptions(this, 'notes/', (note) => ({
-					name: `#${String(note.id)}${note.info ? ` - ${String(note.info).slice(0, 25)}` : ''}`,
-					value: note.id as number,
-				}));
+				const notes = await loadSubresourceItems(this, 'notes/');
+				return notes
+					.sort(
+						(a, b) =>
+							noteTimestamp(b) - noteTimestamp(a) || Number(b.id ?? 0) - Number(a.id ?? 0),
+					)
+					.map((note) => ({
+						name: formatNoteOptionName(note),
+						value: note.id as number,
+					}));
 			},
 
 			async getMatchPipelineStages(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -380,6 +410,87 @@ export class Manatal implements INodeType {
 						value: job.id as string | number,
 					})),
 					paginationToken: response.next ? String(currentPage + 1) : undefined,
+				};
+			},
+
+			async searchAttachments(
+				this: ILoadOptionsFunctions,
+				filter?: string,
+			): Promise<INodeListSearchResult> {
+				const options = await loadSubresourceOptions(this, 'attachments/', (att) => ({
+					name: `#${String(att.id)}${att.name ? ` - ${String(att.name)}` : ''}`,
+					value: att.id as string | number,
+				}));
+				const results = filter
+					? options.filter((option) =>
+							`${option.name} ${String(option.value)}`.toLowerCase().includes(filter.toLowerCase()),
+						)
+					: options;
+				return { results };
+			},
+
+			async searchCandidateMatches(
+				this: ILoadOptionsFunctions,
+				filter?: string,
+			): Promise<INodeListSearchResult> {
+				const candidateId = normalizeManatalId(
+					this.getNodeParameter('candidateId') as IDataObject | string,
+				);
+				if (!candidateId) return { results: [] };
+				const response = await manatalApiRequest.call(
+					this,
+					'GET',
+					`/candidates/${candidateId}/matches/`,
+				);
+				const matches = Array.isArray(response)
+					? response
+					: (((response as IDataObject).results as IDataObject[] | undefined) ?? []);
+				const results = matches.map((match) => {
+					const s = match.job_pipeline_stage as IDataObject | null;
+					const stageSuffix =
+						s && typeof s === 'object' && s.name ? ` [${s.name as string}]` : '';
+					return {
+						name: `Match ${String(match.id)}: Job ${String(match.job)}${stageSuffix}`,
+						value: match.id as string | number,
+					};
+				});
+				return {
+					results: filter
+						? results.filter((option) =>
+								`${option.name} ${String(option.value)}`
+									.toLowerCase()
+									.includes(filter.toLowerCase()),
+							)
+						: results,
+				};
+			},
+			async searchJobMatches(
+				this: ILoadOptionsFunctions,
+				filter?: string,
+			): Promise<INodeListSearchResult> {
+				const jobId = normalizeManatalId(this.getNodeParameter('jobId') as IDataObject | string);
+				if (!jobId) return { results: [] };
+				const response = await manatalApiRequest.call(this, 'GET', `/jobs/${jobId}/matches/`);
+				const matches = Array.isArray(response)
+					? response
+					: (((response as IDataObject).results as IDataObject[] | undefined) ?? []);
+				const results = matches.map((match) => {
+					const s = match.job_pipeline_stage as IDataObject | null;
+					const stageSuffix =
+						s && typeof s === 'object' && s.name ? ` [${s.name as string}]` : '';
+					return {
+						name: `Match ${String(match.id)}: Candidate ${String(match.candidate)}${stageSuffix}`,
+						value: match.id as string | number,
+					};
+				});
+				return {
+					results: filter
+						? results.filter((option) =>
+								`${option.name} ${String(option.value)}`
+									.toLowerCase()
+									.includes(filter.toLowerCase()),
+							)
+						: results,
 				};
 			},
 

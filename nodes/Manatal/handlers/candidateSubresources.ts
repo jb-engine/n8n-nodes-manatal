@@ -7,7 +7,7 @@
  *   candidateMatch     — read-only view of pipeline matches for a candidate
  *                        (paginated, getMany + get by ID)
  *   candidateResume    — non-standard URL shape (/resume/ not /resumes/),
- *                        raw-array response, supports get and upload only
+ *                        raw-array response, supports getMany and upload only
  *   candidateSocialMedia — raw-array list, supports optional platform filter,
  *                          create and get by ID
  *
@@ -46,10 +46,16 @@ export async function candidateSubresourceExecute(
 
 	// Resume: non-standard URL (/resume/ singular), raw array response, no update
 	if (resource === 'candidateResume') {
-		if (operation === 'get') {
-			return asArray(
-				await manatalApiRequest.call(this, 'GET', `/candidates/${candidateId}/resume/`),
+		if (operation === 'getMany') {
+			const response = await manatalApiRequest.call(
+				this,
+				'GET',
+				`/candidates/${candidateId}/resume/`,
 			);
+			if (Array.isArray(response)) return response as IDataObject[];
+			if (response && typeof response === 'object') return [response as IDataObject];
+			if (typeof response === 'string') return [{ resume: response }];
+			return [];
 		}
 		if (operation === 'upload') {
 			const resumeFile = this.getNodeParameter('resume_file', i) as string;

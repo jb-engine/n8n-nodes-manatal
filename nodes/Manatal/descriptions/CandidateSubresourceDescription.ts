@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { CANDIDATE_MODES, MATCH_MODES } from './SharedFields';
+import { CANDIDATE_MATCH_MODES, CANDIDATE_MODES } from './SharedFields';
 
 //	CANDIDATE RESUME
 
@@ -215,7 +215,7 @@ export const candidateMatchViewFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		modes: MATCH_MODES,
+		modes: CANDIDATE_MATCH_MODES,
 		displayOptions: { show: { resource: ['candidateMatch'], operation: ['get'] } },
 		description: 'Numeric ID of the match to retrieve',
 	},

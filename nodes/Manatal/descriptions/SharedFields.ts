@@ -22,7 +22,11 @@ function idMode(resourceName: string): Modes[number] {
 	return mode;
 }
 
-function listMode(displayName: string, searchListMethod: string): Modes[number] {
+function listMode(
+	displayName: string,
+	searchListMethod: string,
+	loadOptionsDependsOn?: string[],
+): Modes[number] {
 	const mode = {
 		displayName,
 		name: 'list',
@@ -32,6 +36,7 @@ function listMode(displayName: string, searchListMethod: string): Modes[number] 
 			searchListMethod,
 			searchFilterRequired: false,
 			searchable: true,
+			...(loadOptionsDependsOn ? { loadOptionsDependsOn } : {}),
 		},
 	};
 	return mode;
@@ -44,6 +49,18 @@ export const CANDIDATE_MODES: Modes = [
 export const CONTACT_MODES: Modes = [listMode('From List', 'searchContacts'), idMode('contact')];
 export const JOB_MODES: Modes = [listMode('From List', 'searchJobs'), idMode('job')];
 export const MATCH_MODES: Modes = [listMode('From List', 'searchMatches'), idMode('match')];
+export const CANDIDATE_MATCH_MODES: Modes = [
+	listMode('From List', 'searchCandidateMatches', ['candidateId']),
+	idMode('match'),
+];
+export const JOB_MATCH_MODES: Modes = [
+	listMode('From List', 'searchJobMatches', ['jobId']),
+	idMode('match'),
+];
+export const ATTACHMENT_MODES: Modes = [
+	listMode('From List', 'searchAttachments'),
+	idMode('attachment'),
+];
 export const USER_MODES: Modes = [listMode('From List', 'searchUsers'), idMode('user')];
 export const ORGANIZATION_MODES: Modes = [
 	listMode('From List', 'searchOrganizations'),

@@ -1,5 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 import {
+	ATTACHMENT_MODES,
 	CANDIDATE_MODES,
 	CONTACT_MODES,
 	JOB_MODES,
@@ -112,18 +113,14 @@ export const attachmentFields: INodeProperties[] = [
 	{
 		displayName: 'Attachment Name or ID',
 		name: 'attachmentId',
-		type: 'options',
+		type: 'resourceLocator',
 		required: true,
-		default: '',
+		default: { mode: 'list', value: '' },
+		modes: ATTACHMENT_MODES,
 		displayOptions: {
 			show: { resource: ALL_ATTACHMENT_RESOURCES, operation: ['get', 'update'] },
 		},
-		description:
-			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
-		typeOptions: {
-			loadOptionsMethod: 'getAttachmentOptions',
-			loadOptionsDependsOn: ['candidateId', 'contactId', 'jobId', 'matchId', 'organizationId'],
-		},
+		description: 'Numeric ID of the attachment to retrieve or update',
 	},
 
 	//	Create

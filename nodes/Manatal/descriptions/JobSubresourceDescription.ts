@@ -1,5 +1,5 @@
 import type { INodeProperties } from 'n8n-workflow';
-import { JOB_MODES, MATCH_MODES } from './SharedFields';
+import { JOB_MATCH_MODES, JOB_MODES } from './SharedFields';
 
 export const jobMatchViewOperations: INodeProperties[] = [
 	{
@@ -38,7 +38,7 @@ export const jobMatchViewFields: INodeProperties[] = [
 		type: 'resourceLocator',
 		required: true,
 		default: { mode: 'list', value: '' },
-		modes: MATCH_MODES,
+		modes: JOB_MATCH_MODES,
 		displayOptions: { show: { resource: ['jobMatch'], operation: ['get'] } },
 		description: 'Numeric ID of the pipeline match to retrieve',
 	},

@@ -1,6 +1,6 @@
 {
 	"name": "@manatal/n8n-nodes-manatal",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "n8n community node for Manatal — automate your ATS workflows by connecting candidates, jobs, matches, contacts, and organisations to 400+ services",
 	"license": "MIT",
 	"homepage": "https://github.com/jb-engine/n8n-nodes-manatal#readme",

@@ -71,6 +71,7 @@ function setWebhookStaticData(
 	}
 }
 
+// eslint-disable-next-line @n8n/community-nodes/node-usable-as-tool
 export class ManatalTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Manatal Trigger',
@@ -80,7 +81,6 @@ export class ManatalTrigger implements INodeType {
 		version: 1,
 		description: 'Starts a workflow when a selected Manatal event occurs',
 		subtitle: '={{$parameter["event"]}}',
-		usableAsTool: true,
 		defaults: { name: 'Manatal Trigger' },
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],

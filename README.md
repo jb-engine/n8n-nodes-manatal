@@ -53,7 +53,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 | Resource                   | Operations            |
 | -------------------------- | --------------------- |
 | **Candidate Match**        | Get, Get Many         |
-| **Candidate Resume**       | Get, Upload           |
+| **Candidate Resume**       | Get Many, Upload      |
 | **Candidate Social Media** | Create, Get, Get Many |
 
 ### Job Sub-resources

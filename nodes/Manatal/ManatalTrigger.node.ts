@@ -231,6 +231,7 @@ export class ManatalTrigger implements INodeType {
 						setWebhookStaticData(staticData);
 						return true;
 					}
+					this.logger.warn('Failed to delete Manatal webhook', { webhookId, error });
 					return false;
 				}
 
